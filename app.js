@@ -61,6 +61,8 @@
       this.activeCategory = 'all';
       this.priceMode = 'unit';
       this.searchQuery = '';
+      this.currentPage = 1;
+      this.productsPerPage = 24;
       
       this.selectedProduct = null;
       this.isCartOpen = false;
@@ -258,18 +260,21 @@
 
           case 'set-brand':
             this.activeBrand = id;
+            this.currentPage = 1;
             this.renderStorefront();
             document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
             break;
 
           case 'set-category':
             this.activeCategory = id;
+            this.currentPage = 1;
             this.renderStorefront();
             document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
             break;
 
           case 'set-pricemode':
             this.priceMode = id;
+            this.currentPage = 1;
             this.renderStorefront();
             break;
 
@@ -330,6 +335,7 @@
       document.addEventListener('input', (e) => {
         if (e.target.id === 'productSearchInput') {
           this.searchQuery = e.target.value.toLowerCase();
+          this.currentPage = 1;
           this.renderProductsList();
         } else if (e.target.id === 'adminInventorySearch') {
           this.adminSearchQuery = e.target.value.toLowerCase();
@@ -1223,14 +1229,21 @@
         return;
       }
 
-      grid.innerHTML = filtered.map(p => {
+      const totalPages = Math.ceil(filtered.length / this.productsPerPage);
+      if (this.currentPage > totalPages) this.currentPage = 1;
+      const start = (this.currentPage - 1) * this.productsPerPage;
+      const paginated = filtered.slice(start, start + this.productsPerPage);
+
+      grid.innerHTML = paginated.map((p, idx) => {
         const displayPrice = this.priceMode === 'carton' ? p.ctnPrice : p.price;
         const unitLabel = this.priceMode === 'carton' ? `Wholesale Carton (${p.pcsPerCtn} pcs)` : 'Single Unit Rate';
+        // First 8 images load eagerly; rest are lazy-loaded for performance
+        const loadStrategy = idx < 8 ? 'eager' : 'lazy';
 
         return `
           <div class="luxury-product-card">
             <div class="product-image-container" data-action="view-product" data-id="${p.id}">
-              <img src="${p.image}" alt="${p.name}" class="product-hero-image" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+              <img src="${p.image}" alt="${p.name}" class="product-hero-image" loading="${loadStrategy}" decoding="async" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
               <div class="badge-tag-stack">
                 <span class="tag-brand-pill">${p.brand.replace('_', ' ')}</span>
                 ${p.stock > 10 ? `<span class="badge-stock-in">In Stock</span>` : `<span class="badge-stock-low">Low Stock (${p.stock})</span>`}
@@ -1266,6 +1279,42 @@
           </div>
         `;
       }).join('');
+
+      // Render pagination controls if more than one page
+      if (totalPages > 1) {
+        const paginationEl = document.createElement('div');
+        paginationEl.className = 'pagination-controls';
+        paginationEl.innerHTML = `
+          <div style="grid-column: 1/-1; display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 2rem 0; flex-wrap: wrap;">
+            <button class="page-btn" data-action="page-prev" ${this.currentPage === 1 ? 'disabled' : ''} style="padding: 0.5rem 1.1rem; border-radius: 8px; border: 1.5px solid var(--border-gold); background: ${this.currentPage === 1 ? 'var(--bg-surface)' : 'var(--primary-gold)'}; color: ${this.currentPage === 1 ? 'var(--text-muted)' : '#1a1200'}; font-weight: 700; cursor: ${this.currentPage === 1 ? 'not-allowed' : 'pointer'};">← Prev</button>
+            ${Array.from({ length: totalPages }, (_, i) => i + 1).map(pg => `
+              <button class="page-btn" data-action="page-go" data-id="${pg}" style="padding: 0.5rem 0.9rem; border-radius: 8px; border: 1.5px solid ${pg === this.currentPage ? 'var(--primary-gold)' : 'var(--border-subtle)'}; background: ${pg === this.currentPage ? 'var(--primary-gold)' : 'var(--bg-surface)'}; color: ${pg === this.currentPage ? '#1a1200' : 'var(--text-body)'}; font-weight: 700; cursor: pointer;">${pg}</button>
+            `).join('')}
+            <button class="page-btn" data-action="page-next" ${this.currentPage === totalPages ? 'disabled' : ''} style="padding: 0.5rem 1.1rem; border-radius: 8px; border: 1.5px solid var(--border-gold); background: ${this.currentPage === totalPages ? 'var(--bg-surface)' : 'var(--primary-gold)'}; color: ${this.currentPage === totalPages ? 'var(--text-muted)' : '#1a1200'}; font-weight: 700; cursor: ${this.currentPage === totalPages ? 'not-allowed' : 'pointer'};">Next →</button>
+            <span style="color: var(--text-muted); font-size: 0.82rem; margin-left: 0.5rem;">Showing ${start + 1}–${Math.min(start + this.productsPerPage, filtered.length)} of ${filtered.length} products</span>
+          </div>
+        `;
+        grid.appendChild(paginationEl);
+
+        paginationEl.addEventListener('click', (e) => {
+          const btn = e.target.closest('[data-action]');
+          if (!btn) return;
+          const action = btn.dataset.action;
+          if (action === 'page-prev' && this.currentPage > 1) {
+            this.currentPage--;
+            this.renderProductsList();
+            document.getElementById('productsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else if (action === 'page-next' && this.currentPage < totalPages) {
+            this.currentPage++;
+            this.renderProductsList();
+            document.getElementById('productsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } else if (action === 'page-go') {
+            this.currentPage = parseInt(btn.dataset.id);
+            this.renderProductsList();
+            document.getElementById('productsGrid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      }
     }
 
     renderProductModal() {
