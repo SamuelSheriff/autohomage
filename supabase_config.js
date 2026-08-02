@@ -1,10 +1,7 @@
 // AUTO HOMAGE - SUPABASE CONFIGURATION FILE
-// Enter your Supabase credentials from https://supabase.com/dashboard/project/_/settings/api
+// Supabase project: https://whlgohipahpdazdodlwp.supabase.co
 
 window.SUPABASE_CONFIG = {
-  // Replace with your project URL, e.g. "https://xyzcompany.supabase.co"
-  url: "YOUR_SUPABASE_PROJECT_URL",
-  
-  // Replace with your project Anon Public Key
-  anonKey: "YOUR_SUPABASE_ANON_KEY"
+  url: "https://whlgohipahpdazdodlwp.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndobGdvaGlwYWhwZGF6ZG9kbHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2OTI3MjMsImV4cCI6MjA5OTI2ODcyM30.-CPYM8nRRsOnE38GZ7HyUO-iPEVCelfey06sXiUv5_I"
 };
