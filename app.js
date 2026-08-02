@@ -400,28 +400,19 @@
 
     async handleAdminLoginSubmit(e) {
       e.preventDefault();
+      const username = e.target.adminUsername.value.trim();
       const pass = e.target.adminPassword.value;
 
-      let isValid = false;
-      try {
-        const res = await fetch('/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ password: pass })
-        });
-        if (res.ok) isValid = true;
-      } catch (err) {
-        // Offline check fallback
-      }
+      const isValid = (username === 'Dauti' && pass === '@Angel10');
 
-      if (isValid || ['autohomage2026', '8800', 'admin'].includes(pass)) {
+      if (isValid) {
         this.isAdminAuthenticated = true;
         sessionStorage.setItem('autohomage_admin_auth', 'true');
         this.isAdminAuthModalOpen = false;
         this.renderAdminAuthModal();
         this.activeView = 'admin';
         this.render();
-        this.showToast('Authentication Successful. Operations Portal unlocked.');
+        this.showToast('Authentication Successful. Welcome, Dauti.');
       } else {
         const errEl = document.getElementById('adminAuthError');
         if (errEl) errEl.style.display = 'block';
@@ -1629,16 +1620,21 @@
           </div>
 
           <h2 style="margin-bottom: 0.4rem;">Secured Operations Access</h2>
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">Enter administrator security PIN to manage products, pricing & store inventory.</p>
+          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">Enter your administrator credentials to manage products, pricing & store inventory.</p>
 
           <form id="adminLoginForm" onsubmit="window.app.handleAdminLoginSubmit(event)">
+            <div style="margin-bottom: 1rem; text-align: left;">
+              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">USERNAME</label>
+              <input type="text" name="adminUsername" class="warm-input" placeholder="Enter your username" required autofocus style="font-size: 1rem; text-align: center;">
+            </div>
+
             <div style="margin-bottom: 1.2rem; text-align: left;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">ADMINISTRATOR PASSWORD / PIN</label>
-              <input type="password" name="adminPassword" class="warm-input" placeholder="Enter password (e.g. autohomage2026 or 8800)" required autofocus style="font-size: 1.1rem; text-align: center; letter-spacing: 0.1em;">
+              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">PASSWORD</label>
+              <input type="password" name="adminPassword" class="warm-input" placeholder="Enter your password" required style="font-size: 1rem; text-align: center; letter-spacing: 0.1em;">
             </div>
 
             <div id="adminAuthError" style="display: none; color: var(--accent-deep-red); font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; background: #fef2f2; border: 1px solid #fca5a5; padding: 0.5rem; border-radius: 6px;">
-              ✕ Invalid password. Please try again.
+              ✕ Invalid username or password. Please try again.
             </div>
 
             <button type="submit" class="btn-gold-action" style="width: 100%; padding: 0.9rem;">
