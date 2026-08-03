@@ -76,11 +76,13 @@
       this.viewingOrder = null;
 
       // Admin Authentication & Sub-Tab State
+      this.adminPassword = localStorage.getItem('autohomage_admin_password') || '@Angel10';
       this.isAdminAuthenticated = sessionStorage.getItem('autohomage_admin_auth') === 'true';
       this.isAdminAuthModalOpen = false;
       this.isAddProductModalOpen = false;
-      this.adminActiveTab = 'inventory'; // 'inventory' | 'orders'
+      this.adminActiveTab = 'inventory'; // 'inventory' | 'orders' | 'security'
       this.adminSearchQuery = '';
+      this.secretClickCount = 0;
 
       this.supabaseClient = null;
       this.initSupabase();
@@ -103,6 +105,16 @@
     async init() {
       this.bindEvents();
       await this.fetchBackendData();
+      
+      // Secret URL hash / query parameter trigger (#admin or ?admin=true)
+      if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+        if (!this.isAdminAuthenticated) {
+          this.isAdminAuthModalOpen = true;
+        } else {
+          this.activeView = 'admin';
+        }
+      }
+      
       this.render();
     }
 
@@ -186,6 +198,21 @@
     }
 
     bindEvents() {
+      // Secret Keyboard Shortcut: Ctrl + Shift + A (or Cmd + Shift + A) to open Admin Portal
+      document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+          e.preventDefault();
+          if (!this.isAdminAuthenticated) {
+            this.isAdminAuthModalOpen = true;
+            this.renderAdminAuthModal();
+          } else {
+            this.activeView = this.activeView === 'admin' ? 'store' : 'admin';
+            this.render();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        }
+      });
+
       document.addEventListener('click', (e) => {
         const target = e.target.closest('[data-action]');
         if (!target) return;
@@ -468,7 +495,7 @@
       const username = e.target.adminUsername.value.trim();
       const pass = e.target.adminPassword.value;
 
-      const isValid = (username === 'Dauti' && pass === '@Angel10');
+      const isValid = (username.toLowerCase() === 'dauti' && pass === this.adminPassword);
 
       if (isValid) {
         this.adminLoginAttempts = 0;
@@ -493,6 +520,70 @@
           }
         }
       }
+    }
+
+    handleSecretFooterClick() {
+      this.secretClickCount = (this.secretClickCount || 0) + 1;
+      if (this.secretClickCount >= 3) {
+        this.secretClickCount = 0;
+        if (!this.isAdminAuthenticated) {
+          this.isAdminAuthModalOpen = true;
+          this.renderAdminAuthModal();
+        } else {
+          this.activeView = 'admin';
+          this.render();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
+      setTimeout(() => { this.secretClickCount = 0; }, 2000);
+    }
+
+    handleChangeAdminPasswordSubmit(e) {
+      e.preventDefault();
+      const form = e.target;
+      const currentPass = form.currentAdminPassword.value;
+      const newPass = form.newAdminPassword.value;
+      const confirmPass = form.confirmAdminPassword.value;
+
+      const errEl = document.getElementById('changePwdError');
+      const successEl = document.getElementById('changePwdSuccess');
+      if (errEl) errEl.style.display = 'none';
+      if (successEl) successEl.style.display = 'none';
+
+      if (currentPass !== this.adminPassword) {
+        if (errEl) {
+          errEl.style.display = 'block';
+          errEl.textContent = '✕ Current password is incorrect.';
+        }
+        return;
+      }
+
+      if (newPass.length < 6) {
+        if (errEl) {
+          errEl.style.display = 'block';
+          errEl.textContent = '✕ New password must be at least 6 characters long.';
+        }
+        return;
+      }
+
+      if (newPass !== confirmPass) {
+        if (errEl) {
+          errEl.style.display = 'block';
+          errEl.textContent = '✕ New password and confirmation do not match.';
+        }
+        return;
+      }
+
+      this.adminPassword = newPass;
+      localStorage.setItem('autohomage_admin_password', newPass);
+
+      if (successEl) {
+        successEl.style.display = 'block';
+        successEl.textContent = '✓ Admin password changed successfully!';
+      }
+
+      form.reset();
+      this.showToast('Admin password updated successfully!');
     }
 
     async handleAddProductSubmit(e) {
@@ -826,10 +917,13 @@
               <span>Call ${HOTLINE_PHONE}</span>
             </a>
 
-            <button class="admin-portal-btn" data-action="toggle-view" style="${this.isAdminAuthenticated ? 'border-color: #22c55e;' : ''}">
-              ${this.isAdminAuthenticated ? ICONS.lock : ICONS.chart}
-              <span>${this.activeView === 'store' ? (this.isAdminAuthenticated ? 'Admin Portal' : 'Admin Login') : 'Back to Store'}</span>
-            </button>
+            <!-- Hide Admin Portal trigger button from regular customers when unauthenticated -->
+            ${this.isAdminAuthenticated ? `
+              <button class="admin-portal-btn" data-action="toggle-view" style="border-color: #22c55e;">
+                ${ICONS.lock}
+                <span>${this.activeView === 'store' ? 'Admin Portal' : 'Back to Store'}</span>
+              </button>
+            ` : ''}
 
             ${this.activeView === 'store' ? `
               <button class="cart-drawer-trigger" data-action="open-cart">
@@ -925,7 +1019,7 @@
         </div>
 
         <div class="footer-bottom">
-          <span>© 2026 Auto Homage. All Rights Reserved.</span>
+          <span style="cursor: default;" onclick="window.app.handleSecretFooterClick()">© 2026 Auto Homage. All Rights Reserved.</span>
           <span style="color: var(--primary-gold); font-weight: 700;">Quality Parts. Premium Care.</span>
         </div>
       `;
@@ -1973,12 +2067,15 @@
           </div>
 
           <!-- ADMIN TAB NAVIGATION -->
-          <div style="display: flex; gap: 0.8rem; border-bottom: 2px solid var(--border-subtle); padding-bottom: 0.8rem;">
+          <div style="display: flex; gap: 0.8rem; border-bottom: 2px solid var(--border-subtle); padding-bottom: 0.8rem; flex-wrap: wrap;">
             <button class="admin-tab-btn ${this.adminActiveTab === 'inventory' ? 'active' : ''}" data-action="admin-set-tab" data-id="inventory">
               📦 Products & Price Inventory (${this.products.length})
             </button>
             <button class="admin-tab-btn ${this.adminActiveTab === 'orders' ? 'active' : ''}" data-action="admin-set-tab" data-id="orders">
               📋 Order Pipeline & Financials (${this.orders.length})
+            </button>
+            <button class="admin-tab-btn ${this.adminActiveTab === 'security' ? 'active' : ''}" data-action="admin-set-tab" data-id="security">
+              🔐 Security & Password Settings
             </button>
           </div>
 
@@ -1997,6 +2094,38 @@
               <div id="adminInventoryTableContainer" style="overflow-x: auto;">
                 <!-- Rendered via renderAdminInventoryTable() -->
               </div>
+            </div>
+          ` : (this.adminActiveTab === 'security' ? `
+            <!-- SECURITY & PASSWORD MANAGEMENT TAB -->
+            <div style="background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-lg); padding: 2rem; max-width: 520px; box-shadow: var(--shadow-sm);">
+              <h3 style="margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; color: var(--bg-dark-obsidian);">
+                🔐 Security &amp; Master Password Settings
+              </h3>
+              <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.6rem;">Update your administrator credentials for store operations access.</p>
+
+              <form onsubmit="window.app.handleChangeAdminPasswordSubmit(event)">
+                <div style="margin-bottom: 1.2rem;">
+                  <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">CURRENT PASSWORD</label>
+                  <input type="password" name="currentAdminPassword" class="warm-input" placeholder="Enter current password" required style="font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 1.2rem;">
+                  <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">NEW PASSWORD</label>
+                  <input type="password" name="newAdminPassword" class="warm-input" placeholder="Enter new password (min 6 characters)" required minlength="6" style="font-size: 0.95rem;">
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                  <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">CONFIRM NEW PASSWORD</label>
+                  <input type="password" name="confirmAdminPassword" class="warm-input" placeholder="Confirm new password" required minlength="6" style="font-size: 0.95rem;">
+                </div>
+
+                <div id="changePwdError" style="display: none; color: #dc2626; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; background: #fef2f2; border: 1px solid #fca5a5; padding: 0.65rem 0.9rem; border-radius: 8px;"></div>
+                <div id="changePwdSuccess" style="display: none; color: #15803d; font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; background: #dcfce7; border: 1px solid #86efac; padding: 0.65rem 0.9rem; border-radius: 8px;"></div>
+
+                <button type="submit" class="btn-gold-action" style="width: 100%; padding: 0.9rem; font-weight: 800;">
+                  ✓ Update Administrator Password
+                </button>
+              </form>
             </div>
           ` : `
             <!-- ORDERS & FINANCIAL CONTROL TAB -->
@@ -2082,7 +2211,7 @@
                 </table>
               </div>
             </div>
-          `}
+          `)}
         </div>
       `;
 
