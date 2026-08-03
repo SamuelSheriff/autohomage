@@ -867,7 +867,6 @@ header {
 
 .admin-table-input {
   width: 100%;
-  max-width: 110px;
   padding: 0.4rem 0.6rem;
   border: 1.5px solid var(--border-strong);
   border-radius: var(--radius-sm);
@@ -877,11 +876,31 @@ header {
   color: var(--text-main);
   outline: none;
   transition: var(--transition);
+  box-sizing: border-box;
 }
 .admin-table-input:focus {
   border-color: var(--primary-gold);
   background: #ffffff;
   box-shadow: 0 0 0 2px rgba(198, 146, 20, 0.2);
+}
+
+.btn-img-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--primary-gold-light);
+  color: var(--primary-gold-dark);
+  border: 1px solid var(--border-gold);
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-img-upload:hover {
+  background: var(--primary-gold);
+  color: #ffffff;
 }
 
 /* ===================== ADMIN DASHBOARD ===================== */
@@ -961,6 +980,68 @@ header {
 .footer-contact-item strong { color: #ffffff; }
 .footer-contact-item a { color: #fef08a; font-weight: 700; }
 .footer-contact-item a:hover { color: var(--primary-gold); }
+
+/* ===================== SOCIAL MEDIA STYLES ===================== */
+.social-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e7e5e4;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: var(--transition);
+}
+.social-chip:hover {
+  background: var(--primary-gold);
+  border-color: var(--primary-gold);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.social-contact-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.social-contact-btn.tiktok-btn {
+  background: #000000;
+  color: #ffffff;
+  border: 1px solid #333;
+}
+.social-contact-btn.tiktok-btn:hover {
+  background: #111111;
+  border-color: #ee1d52;
+  box-shadow: 0 4px 12px rgba(238, 29, 82, 0.3);
+  transform: translateY(-2px);
+}
+.social-contact-btn.facebook-btn {
+  background: #1877f2;
+  color: #ffffff;
+}
+.social-contact-btn.facebook-btn:hover {
+  background: #1464cc;
+  box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+  transform: translateY(-2px);
+}
+.social-contact-btn.instagram-btn {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  color: #ffffff;
+}
+.social-contact-btn.instagram-btn:hover {
+  opacity: 0.92;
+  box-shadow: 0 4px 12px rgba(220, 39, 67, 0.3);
+  transform: translateY(-2px);
+}
 
 .footer-bottom {
   border-top: 1px solid #292524;

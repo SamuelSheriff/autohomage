@@ -106,13 +106,13 @@ def seed_initial_data(conn):
     ''', products_seed)
 
     orders_seed = [
-        ('ORD-2026-8801', 'Michael Kibet', 'm.kibet@gmail.com', '0799939056', 'Nairobi', 'Westlands, Parklands Rd', 'Toyota Prado (2020)', json.dumps([
+        ('ORD-2026-8801', 'Michael Kibet', 'm.kibet@gmail.com', '0768081909', 'Nairobi', 'Westlands, Parklands Rd', 'Toyota Prado (2020)', json.dumps([
             {"id": "AH-GT-0610", "name": "Gladiator Tyre Inflator Big 12V", "qty": 1, "price": 3000, "type": "unit"},
             {"id": "AH-GT-0041", "name": "Gladiator Carnauba Car Wax Paste", "qty": 2, "price": 400, "type": "unit"},
             {"id": "AH-PART-BRAKEPAD", "name": "Premium Ceramic Front Brake Pad Set", "qty": 1, "price": 3200, "type": "unit"}
         ]), 7000, 'M-Pesa / Mobile Money', 'Paid', 'Delivered', '2026-07-28 14:22'),
 
-        ('ORD-2026-8802', 'Sarah Jenkins', 'sarah.j@outlook.com', '0799939056', 'Mombasa', 'Nyali Beach Road', 'Subaru Forester (2019)', json.dumps([
+        ('ORD-2026-8802', 'Sarah Jenkins', 'sarah.j@outlook.com', '0768081909', 'Mombasa', 'Nyali Beach Road', 'Subaru Forester (2019)', json.dumps([
             {"id": "AH-GT-0004", "name": "Gladiator Dashboard Polish", "qty": 1, "price": 4800, "type": "carton"},
             {"id": "AH-MAT-SUBARU", "name": "Subaru All-Weather Custom Floor Mats Set", "qty": 1, "price": 2800, "type": "unit"}
         ]), 7600, 'Credit Card', 'Paid', 'Shipped', '2026-07-29 09:15')
@@ -346,6 +346,8 @@ class AutoHomageRequestHandler(SimpleHTTPRequestHandler):
             name = payload.get('name')
             description = payload.get('description')
 
+            image = payload.get('image')
+
             updates = []
             params = []
 
@@ -361,6 +363,9 @@ class AutoHomageRequestHandler(SimpleHTTPRequestHandler):
             if name:
                 updates.append('name = ?')
                 params.append(name)
+            if image:
+                updates.append('image = ?')
+                params.append(image)
             if description:
                 updates.append('description = ?')
                 params.append(description)

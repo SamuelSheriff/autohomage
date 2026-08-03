@@ -483,7 +483,7 @@ window.AUTO_HOMAGE_DATA = {
   INITIAL_ORDERS: [
     {
       id: 'ORD-2026-8801',
-      customer: { name: 'Michael Kibet', email: 'm.kibet@gmail.com', phone: '0799939056', city: 'Nairobi', address: 'Westlands, Parklands Rd' },
+      customer: { name: 'Michael Kibet', email: 'm.kibet@gmail.com', phone: '0768081909', city: 'Nairobi', address: 'Westlands, Parklands Rd' },
       vehicle: 'Toyota Prado (2020)',
       items: [
         { id: 'AH-GT-0610', name: 'Gladiator Tyre Inflator Big 12V', qty: 1, price: 3000 },

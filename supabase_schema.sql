@@ -83,5 +83,5 @@ ON CONFLICT (id) DO NOTHING;
 -- 5. Seed Demo Orders
 INSERT INTO public.orders (id, customer_name, customer_email, customer_phone, customer_city, customer_address, vehicle, items_json, total_amount, payment_method, payment_status, status, date)
 VALUES
-('ORD-2026-8801', 'Michael Kibet', 'm.kibet@gmail.com', '0799939056', 'Nairobi', 'Westlands, Parklands Rd', 'Toyota Prado (2020)', '[{"id": "AH-GT-0610", "name": "Gladiator Tyre Inflator Big 12V", "qty": 1, "price": 3000, "type": "unit"}]'::jsonb, 3480, 'M-Pesa / Mobile Money', 'Paid', 'Delivered', '2026-07-28 14:22')
+('ORD-2026-8801', 'Michael Kibet', 'm.kibet@gmail.com', '0768081909', 'Nairobi', 'Westlands, Parklands Rd', 'Toyota Prado (2020)', '[{"id": "AH-GT-0610", "name": "Gladiator Tyre Inflator Big 12V", "qty": 1, "price": 3000, "type": "unit"}]'::jsonb, 3480, 'M-Pesa / Mobile Money', 'Paid', 'Delivered', '2026-07-28 14:22')
 ON CONFLICT (id) DO NOTHING;

@@ -31,9 +31,11 @@
   const INITIAL_PRODUCTS = localData.INITIAL_PRODUCTS || [];
   const INITIAL_ORDERS = localData.INITIAL_ORDERS || [];
 
-  const OFFICIAL_LOGO = 'Gemini_Generated_Image_mqk4uamqk4uamqk4.png';
+  const OFFICIAL_LOGO = 'logo.png';
   const HERO_SUPERCAR_IMG = 'hero_car.png';
-  const HOTLINE_PHONE = '0799939056';
+  const HOTLINE_PHONE = '0768081909';
+  const OFFICIAL_EMAIL = 'autohomage@gmail.com';
+  const SOCIAL_HANDLE = 'Auto Homage';
 
   const ICONS = {
     car: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`,
@@ -43,7 +45,11 @@
     phone: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>`,
     chart: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
     lock: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
-    plus: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`
+    plus: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+    email: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>`,
+    facebook: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`,
+    instagram: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>`,
+    tiktok: `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 1 1-5.2-1.74 2.89 2.89 0 0 1 2.31-2.84V7.59a6.34 6.34 0 0 0-5.18 6.16 6.34 6.34 0 1 0 10.86-4.52A8.32 8.32 0 0 0 19.59 10z"/></svg>`
   };
 
   class AutoHomageApp {
@@ -355,29 +361,74 @@
       window.open(`https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}?text=${msg}`, '_blank');
     }
 
+    handleAdminImageUpload(productId, fileInput) {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        const imgPrev = document.getElementById(`adminImgPrev_${productId}`);
+        if (imgPrev) imgPrev.src = dataUrl;
+        const imgInput = document.querySelector(`input[data-image-id="${productId}"]`);
+        if (imgInput) imgInput.value = dataUrl;
+        this.showToast('Picture uploaded! Click "Save Changes" to save.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    handleNewProdImageUpload(fileInput) {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        const imgPrev = document.getElementById('newProdPreview');
+        if (imgPrev) imgPrev.src = dataUrl;
+        const urlInput = document.getElementById('newProdImageUrl');
+        if (urlInput) urlInput.value = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
     async handleSaveProductRow(productId) {
+      const nameInput = document.querySelector(`input[data-name-id="${productId}"]`);
       const priceInput = document.querySelector(`input[data-price-id="${productId}"]`);
       const ctnPriceInput = document.querySelector(`input[data-ctnprice-id="${productId}"]`);
       const stockInput = document.querySelector(`input[data-stock-id="${productId}"]`);
+      const imageInput = document.querySelector(`input[data-image-id="${productId}"]`);
 
       if (!priceInput || !ctnPriceInput || !stockInput) return;
 
+      const newName = nameInput ? nameInput.value.trim() : null;
       const newPrice = parseInt(priceInput.value) || 0;
       const newCtnPrice = parseInt(ctnPriceInput.value) || 0;
       const newStock = parseInt(stockInput.value) || 0;
+      const newImage = imageInput ? imageInput.value.trim() : null;
 
       const p = this.products.find(item => item.id === productId);
       if (p) {
+        if (newName) p.name = newName;
         p.price = newPrice;
         p.ctnPrice = newCtnPrice;
         p.stock = newStock;
+        if (newImage) p.image = newImage;
+
+        const updatePayload = {
+          name: p.name,
+          price: p.price,
+          ctnPrice: p.ctnPrice,
+          stock: p.stock,
+          image: p.image
+        };
 
         if (this.supabaseClient) {
           try {
             await this.supabaseClient.from('products').update({
-              price: newPrice,
-              ctn_price: newCtnPrice,
-              stock: newStock
+              name: p.name,
+              price: p.price,
+              ctn_price: p.ctnPrice,
+              stock: p.stock,
+              image: p.image
             }).eq('id', productId);
           } catch (err) {
             // Supabase update error
@@ -388,24 +439,40 @@
           await fetch(`/api/products/${productId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ price: newPrice, ctnPrice: newCtnPrice, stock: newStock })
+            body: JSON.stringify(updatePayload)
           });
         } catch (err) {
           // Offline fallback
         }
 
-        this.showToast(`Saved pricing for SKU: ${p.code} (Retail: KSh ${newPrice.toLocaleString()})`);
+        this.showToast(`Saved changes for "${p.name}" (SKU: ${p.code})`);
       }
     }
 
     async handleAdminLoginSubmit(e) {
       e.preventDefault();
+      const errEl = document.getElementById('adminAuthError');
+      const submitBtn = document.getElementById('adminAuthSubmitBtn');
+      
+      // Check lockout window (30-second lockout after 5 failed attempts)
+      const now = Date.now();
+      if (this.adminLockoutUntil && now < this.adminLockoutUntil) {
+        const remainingSec = Math.ceil((this.adminLockoutUntil - now) / 1000);
+        if (errEl) {
+          errEl.style.display = 'block';
+          errEl.innerHTML = `⚠️ Account locked due to multiple failed attempts. Please wait <strong>${remainingSec}s</strong>.`;
+        }
+        return;
+      }
+
       const username = e.target.adminUsername.value.trim();
       const pass = e.target.adminPassword.value;
 
       const isValid = (username === 'Dauti' && pass === '@Angel10');
 
       if (isValid) {
+        this.adminLoginAttempts = 0;
+        this.adminLockoutUntil = 0;
         this.isAdminAuthenticated = true;
         sessionStorage.setItem('autohomage_admin_auth', 'true');
         this.isAdminAuthModalOpen = false;
@@ -414,8 +481,17 @@
         this.render();
         this.showToast('Authentication Successful. Welcome, Dauti.');
       } else {
-        const errEl = document.getElementById('adminAuthError');
-        if (errEl) errEl.style.display = 'block';
+        this.adminLoginAttempts = (this.adminLoginAttempts || 0) + 1;
+        if (errEl) {
+          errEl.style.display = 'block';
+          if (this.adminLoginAttempts >= 5) {
+            this.adminLockoutUntil = Date.now() + 30000; // 30s lockout
+            errEl.innerHTML = `🛑 Too many failed attempts. Security lockout active for 30 seconds.`;
+          } else {
+            const left = 5 - this.adminLoginAttempts;
+            errEl.innerHTML = `✕ Invalid username or password. (${left} attempt${left > 1 ? 's' : ''} remaining before lockout)`;
+          }
+        }
       }
     }
 
@@ -432,8 +508,11 @@
       const pcsPerCtn = parseInt(form.prodPcsPerCtn.value || 1);
       const stock = parseInt(form.prodStock.value || 50);
       const isUniversal = form.prodApplication.value === 'universal';
-      const image = form.prodImage.value || 'Products/Gradiator Products/Multi-Purpose Degreaser.jpg';
+      // Read image from the new upload/URL input
+      const imageUrlInput = document.getElementById('newProdImageUrl');
+      const image = (imageUrlInput && imageUrlInput.value.trim()) || 'Products/Gradiator Products/Multi-Purpose Degreaser.jpg';
       const description = form.prodDescription.value || '';
+
 
       const newProd = {
         id: 'AH-PRD-' + Math.floor(10000 + Math.random() * 90000),
@@ -780,6 +859,21 @@
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
               WhatsApp Us
             </a>
+
+            <div class="footer-social-wrapper" style="margin-top: 1.2rem;">
+              <div style="font-size: 0.78rem; font-weight: 700; color: #d6d3d1; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem;">Follow Us ("${SOCIAL_HANDLE}")</div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="https://www.tiktok.com/search?q=Auto%20Homage" target="_blank" class="social-chip" title="TikTok - Auto Homage">
+                  ${ICONS.tiktok} <span>TikTok</span>
+                </a>
+                <a href="https://www.facebook.com/search/top?q=Auto%20Homage" target="_blank" class="social-chip" title="Facebook - Auto Homage">
+                  ${ICONS.facebook} <span>Facebook</span>
+                </a>
+                <a href="https://www.instagram.com/search/top?q=Auto%20Homage" target="_blank" class="social-chip" title="Instagram - Auto Homage">
+                  ${ICONS.instagram} <span>Instagram</span>
+                </a>
+              </div>
+            </div>
           </div>
 
           <div>
@@ -816,6 +910,10 @@
               <div><strong>WhatsApp:</strong><br><a href="https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}" target="_blank">${HOTLINE_PHONE}</a></div>
             </div>
             <div class="footer-contact-item">
+              <span style="font-size: 1.1rem;">✉️</span>
+              <div><strong>Email Us:</strong><br><a href="mailto:${OFFICIAL_EMAIL}">${OFFICIAL_EMAIL}</a></div>
+            </div>
+            <div class="footer-contact-item">
               <span style="font-size: 1.1rem;">📍</span>
               <div><strong>Nairobi, Kenya</strong><br>Nationwide Delivery Available</div>
             </div>
@@ -840,7 +938,7 @@
       container.innerHTML = `
         <div class="contact-hero">
           <h1>Contact <span>Auto Homage</span></h1>
-          <p>We're here to help you find the right product for your vehicle. Call, WhatsApp, or send us a message and we'll respond promptly.</p>
+          <p>We're here to help you find the right product for your vehicle. Call, WhatsApp, email, or connect with us on social media.</p>
         </div>
 
         <div class="contact-grid">
@@ -866,6 +964,34 @@
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                   Chat on WhatsApp Now
                 </a>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-info-icon">✉️</div>
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.2rem;">Official Email</div>
+                <a href="mailto:${OFFICIAL_EMAIL}" style="font-size: 1.1rem; font-weight: 800; color: var(--primary-gold-dark);">${OFFICIAL_EMAIL}</a>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">Direct correspondence & wholesale enquiries</div>
+              </div>
+            </div>
+
+            <div class="contact-info-item">
+              <div class="contact-info-icon">🌐</div>
+              <div>
+                <div style="font-weight: 800; font-size: 0.95rem; margin-bottom: 0.3rem;">Social Media Platforms</div>
+                <div style="font-size: 0.83rem; color: var(--text-muted); margin-bottom: 0.5rem;">Handle: <strong style="color: var(--text-main); font-weight: 800;">"${SOCIAL_HANDLE}"</strong></div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                  <a href="https://www.tiktok.com/search?q=Auto%20Homage" target="_blank" class="social-contact-btn tiktok-btn">
+                    ${ICONS.tiktok} <span>TikTok</span>
+                  </a>
+                  <a href="https://www.facebook.com/search/top?q=Auto%20Homage" target="_blank" class="social-contact-btn facebook-btn">
+                    ${ICONS.facebook} <span>Facebook</span>
+                  </a>
+                  <a href="https://www.instagram.com/search/top?q=Auto%20Homage" target="_blank" class="social-contact-btn instagram-btn">
+                    ${ICONS.instagram} <span>Instagram</span>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -1597,6 +1723,19 @@
       `;
     }
 
+    toggleAdminPasswordVisibility() {
+      const pwdInput = document.getElementById('adminPasswordInput');
+      const eyeIcon = document.getElementById('adminPasswordEyeIcon');
+      if (!pwdInput) return;
+      if (pwdInput.type === 'password') {
+        pwdInput.type = 'text';
+        if (eyeIcon) eyeIcon.textContent = '🙈';
+      } else {
+        pwdInput.type = 'password';
+        if (eyeIcon) eyeIcon.textContent = '👁️';
+      }
+    }
+
     renderAdminAuthModal() {
       let modal = document.getElementById('adminAuthModalOverlay');
       if (!this.isAdminAuthModalOpen) {
@@ -1612,35 +1751,71 @@
       }
 
       modal.innerHTML = `
-        <div class="modal-gold-box" style="padding: 2.5rem; max-width: 440px; text-align: center;">
-          <button class="close-btn-round" data-action="close-admin-auth">✕</button>
+        <div class="modal-gold-box" style="padding: 2.8rem 2.2rem; max-width: 440px; text-align: center; background: linear-gradient(145deg, #1c1917 0%, #0c0a09 100%); border: 2px solid var(--primary-gold); color: #ffffff; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(198, 146, 20, 0.25); border-radius: 20px; position: relative;">
+          
+          <button class="close-btn-round" data-action="close-admin-auth" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); color: #fff;">✕</button>
 
-          <div style="width: 60px; height: 60px; border-radius: 16px; background: var(--bg-dark-obsidian); color: var(--primary-gold); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-            ${ICONS.lock}
+          <!-- TOP BADGE & LOGO EMBLEM -->
+          <div style="margin-bottom: 1.2rem; display: inline-flex; align-items: center; justify-content: center; position: relative;">
+            <div style="width: 72px; height: 72px; border-radius: 50%; background: radial-gradient(circle, var(--primary-gold) 0%, #9a6f10 100%); display: flex; align-items: center; justify-content: center; padding: 3px; box-shadow: 0 0 25px rgba(198, 146, 20, 0.45);">
+              <div style="width: 100%; height: 100%; border-radius: 50%; background: #1c1917; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                <img src="logo.png" alt="Auto Homage Logo" style="width: 48px; height: 48px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <span style="display: none; color: var(--primary-gold); font-size: 1.8rem;">🔒</span>
+              </div>
+            </div>
           </div>
 
-          <h2 style="margin-bottom: 0.4rem;">Secured Operations Access</h2>
-          <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">Enter your administrator credentials to manage products, pricing & store inventory.</p>
+          <h2 style="font-family: var(--font-heading); font-size: 1.45rem; font-weight: 800; color: #ffffff; letter-spacing: 0.02em; margin-bottom: 0.3rem;">
+            AUTO HOMAGE <span style="color: var(--primary-gold);">ADMIN</span>
+          </h2>
+          <p style="color: #a8a29e; font-size: 0.82rem; margin-bottom: 1.8rem;">Authorized Operations &amp; Store Management Portal</p>
 
           <form id="adminLoginForm" onsubmit="window.app.handleAdminLoginSubmit(event)">
-            <div style="margin-bottom: 1rem; text-align: left;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">USERNAME</label>
-              <input type="text" name="adminUsername" class="warm-input" placeholder="Enter your username" required autofocus style="font-size: 1rem; text-align: center;">
+            <!-- USERNAME INPUT -->
+            <div style="margin-bottom: 1.1rem; text-align: left;">
+              <label style="font-size: 0.72rem; font-weight: 800; color: var(--primary-gold); display: block; margin-bottom: 0.4rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                👤 USERNAME
+              </label>
+              <input type="text" name="adminUsername" class="warm-input" placeholder="Enter username" required autofocus
+                style="background: rgba(255, 255, 255, 0.06); border: 1.5px solid rgba(198, 146, 20, 0.4); color: #ffffff; font-size: 0.95rem; padding: 0.75rem 1rem; border-radius: 10px; width: 100%; outline: none; transition: border-color 0.2s;"
+                onfocus="this.style.borderColor='var(--primary-gold)'; this.style.boxShadow='0 0 12px rgba(198, 146, 20, 0.3)';"
+                onblur="this.style.borderColor='rgba(198, 146, 20, 0.4)'; this.style.boxShadow='none';">
             </div>
 
-            <div style="margin-bottom: 1.2rem; text-align: left;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.4rem;">PASSWORD</label>
-              <input type="password" name="adminPassword" class="warm-input" placeholder="Enter your password" required style="font-size: 1rem; text-align: center; letter-spacing: 0.1em;">
+            <!-- PASSWORD INPUT WITH EYE TOGGLE -->
+            <div style="margin-bottom: 1.4rem; text-align: left;">
+              <label style="font-size: 0.72rem; font-weight: 800; color: var(--primary-gold); display: block; margin-bottom: 0.4rem; letter-spacing: 0.08em; text-transform: uppercase;">
+                🔑 PASSWORD
+              </label>
+              <div style="position: relative; display: flex; align-items: center;">
+                <input type="password" id="adminPasswordInput" name="adminPassword" class="warm-input" placeholder="Enter password" required
+                  style="background: rgba(255, 255, 255, 0.06); border: 1.5px solid rgba(198, 146, 20, 0.4); color: #ffffff; font-size: 0.95rem; padding: 0.75rem 2.8rem 0.75rem 1rem; border-radius: 10px; width: 100%; outline: none; transition: border-color 0.2s; letter-spacing: 0.08em;"
+                  onfocus="this.style.borderColor='var(--primary-gold)'; this.style.boxShadow='0 0 12px rgba(198, 146, 20, 0.3)';"
+                  onblur="this.style.borderColor='rgba(198, 146, 20, 0.4)'; this.style.boxShadow='none';">
+                <button type="button" onclick="window.app.toggleAdminPasswordVisibility()" title="Toggle Password Visibility"
+                  style="position: absolute; right: 0.7rem; background: transparent; border: none; color: #a8a29e; font-size: 1.1rem; cursor: pointer; padding: 0.2rem;">
+                  <span id="adminPasswordEyeIcon">👁️</span>
+                </button>
+              </div>
             </div>
 
-            <div id="adminAuthError" style="display: none; color: var(--accent-deep-red); font-size: 0.85rem; font-weight: 700; margin-bottom: 1rem; background: #fef2f2; border: 1px solid #fca5a5; padding: 0.5rem; border-radius: 6px;">
-              ✕ Invalid username or password. Please try again.
+            <!-- ERROR ALERT BOX -->
+            <div id="adminAuthError" style="display: none; color: #fca5a5; font-size: 0.82rem; font-weight: 700; margin-bottom: 1.2rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); padding: 0.65rem 0.9rem; border-radius: 8px; text-align: left;">
+              ✕ Invalid credentials. Access denied.
             </div>
 
-            <button type="submit" class="btn-gold-action" style="width: 100%; padding: 0.9rem;">
-              Unlock Operations Portal
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" id="adminAuthSubmitBtn" class="btn-gold-action"
+              style="width: 100%; padding: 0.9rem; font-size: 0.95rem; font-weight: 800; border-radius: 10px; background: linear-gradient(135deg, var(--primary-gold) 0%, #b8830f 100%); color: #ffffff; border: none; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; box-shadow: 0 4px 15px rgba(198, 146, 20, 0.35);">
+              🔓 Unlock Admin Control Panel
             </button>
           </form>
+
+          <!-- FOOTER SECURITY BADGE -->
+          <div style="margin-top: 1.8rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-size: 0.74rem; color: #78716c;">
+            <span>🛡️</span> <span>Secured Administrator Session</span>
+          </div>
+
         </div>
       `;
     }
@@ -1660,7 +1835,7 @@
       }
 
       modal.innerHTML = `
-        <div class="modal-gold-box" style="padding: 2.5rem; max-width: 650px;">
+        <div class="modal-gold-box" style="padding: 2.5rem; max-width: 680px;">
           <button class="close-btn-round" data-action="close-add-product">✕</button>
 
           <h2 style="margin-bottom: 0.4rem;">Add New Product to Store Catalog</h2>
@@ -1725,9 +1900,32 @@
               </div>
             </div>
 
+            <!-- IMAGE UPLOAD WITH LIVE PREVIEW -->
             <div style="margin-bottom: 1rem;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">PRODUCT IMAGE PATH</label>
-              <input type="text" name="prodImage" class="warm-input" value="Products/Gradiator Products/Multi-Purpose Degreaser.jpg">
+              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.5rem;">PRODUCT IMAGE</label>
+              <div style="display: flex; gap: 1.2rem; align-items: flex-start; background: var(--bg-warm-gold); border: 1.5px solid var(--border-gold); border-radius: var(--radius-md); padding: 1rem;">
+                <!-- Live image preview box -->
+                <div style="flex-shrink: 0; width: 100px; height: 100px; border: 2px dashed var(--border-gold); border-radius: var(--radius-md); background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+                  <img id="newProdPreview" src="" alt="Preview" style="width: 100%; height: 100%; object-fit: contain; display: none;">
+                  <span id="newProdPreviewPlaceholder" style="font-size: 2.2rem;">📷</span>
+                </div>
+                <!-- Upload controls -->
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 0.6rem;">
+                  <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-main);">Upload a picture or paste a URL</div>
+                  <label class="btn-img-upload" style="width: fit-content; cursor: pointer; font-size: 0.82rem; padding: 0.45rem 1rem;">
+                    📤 Choose Image File
+                    <input type="file" accept="image/*" style="display: none;" onchange="window.app.handleNewProdImageUpload(this)">
+                  </label>
+                  <div style="font-size: 0.74rem; color: var(--text-muted);">— or paste an image URL below —</div>
+                  <input type="text" id="newProdImageUrl" class="warm-input" style="font-size: 0.82rem;" placeholder="Products/Folder/photo.jpg  or  https://example.com/img.jpg"
+                    oninput="
+                      const prev=document.getElementById('newProdPreview');
+                      const ph=document.getElementById('newProdPreviewPlaceholder');
+                      if(this.value.trim()){prev.src=this.value.trim();prev.style.display='block';ph.style.display='none';}
+                      else{prev.style.display='none';ph.style.display='block';}
+                    ">
+                </div>
+              </div>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
@@ -1736,7 +1934,7 @@
             </div>
 
             <button type="submit" class="btn-gold-action" style="width: 100%; padding: 0.9rem;">
-              Save & Create Product
+              ✓ Save & Add to Catalog
             </button>
           </form>
         </div>
@@ -1912,38 +2110,65 @@
         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
           <thead>
             <tr style="background: var(--bg-warm-gold); border-bottom: 1px solid var(--border-subtle); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase;">
-              <th style="padding: 0.8rem;">Item</th>
-              <th style="padding: 0.8rem;">SKU Code</th>
-              <th style="padding: 0.8rem;">Name & Brand</th>
-              <th style="padding: 0.8rem;">Retail Price (KSh)</th>
-              <th style="padding: 0.8rem;">Wholesale Carton Rate (KSh)</th>
-              <th style="padding: 0.8rem;">Stock Units</th>
-              <th style="padding: 0.8rem; text-align: center;">Action</th>
+              <th style="padding: 0.8rem; min-width: 110px;">Image</th>
+              <th style="padding: 0.8rem;">SKU</th>
+              <th style="padding: 0.8rem; min-width: 200px;">Product Name &amp; Brand</th>
+              <th style="padding: 0.8rem;">Retail (KSh)</th>
+              <th style="padding: 0.8rem;">Carton (KSh)</th>
+              <th style="padding: 0.8rem;">Stock</th>
+              <th style="padding: 0.8rem; text-align: center; min-width: 120px;">Action</th>
             </tr>
           </thead>
           <tbody>
             ${filtered.map(p => `
-              <tr style="border-bottom: 1px solid var(--border-subtle);">
-                <td style="padding: 0.6rem 0.8rem;">
-                  <img src="${p.image}" alt="${p.name}" style="width: 44px; height: 44px; object-fit: contain; background: #fff; border-radius: 6px; border: 1px solid var(--border-subtle);" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+              <tr style="border-bottom: 1px solid var(--border-subtle); vertical-align: top;">
+                <!-- IMAGE COLUMN with preview + upload -->
+                <td style="padding: 0.8rem;">
+                  <div style="display: flex; flex-direction: column; align-items: center; gap: 0.4rem;">
+                    <img id="adminImgPrev_${p.id}" src="${p.image}" alt="${p.name}"
+                      style="width: 60px; height: 60px; object-fit: contain; background: #fff; border-radius: 8px; border: 1.5px solid var(--border-gold); box-shadow: var(--shadow-sm);"
+                      onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+                    <!-- Hidden input stores the current image src/dataURL -->
+                    <input type="hidden" data-image-id="${p.id}" value="${p.image}">
+                    <!-- File picker button -->
+                    <label class="btn-img-upload" style="cursor: pointer;" title="Upload new product image">
+                      📷 Change
+                      <input type="file" accept="image/*" style="display:none;"
+                        onchange="window.app.handleAdminImageUpload('${p.id}', this)">
+                    </label>
+                  </div>
                 </td>
-                <td style="padding: 0.6rem 0.8rem; font-family: monospace; font-weight: 700; color: var(--primary-gold-dark);">${p.code}</td>
-                <td style="padding: 0.6rem 0.8rem;">
-                  <div style="font-weight: 700; color: var(--bg-dark-obsidian);">${p.name}</div>
-                  <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: capitalize;">${p.brand.replace('_', ' ')} • ${p.category.replace('_', ' ')}</div>
+
+                <!-- SKU CODE -->
+                <td style="padding: 0.8rem; font-family: monospace; font-weight: 700; color: var(--primary-gold-dark); font-size: 0.82rem;">${p.code}</td>
+
+                <!-- EDITABLE NAME -->
+                <td style="padding: 0.8rem;">
+                  <input type="text" class="admin-table-input" style="max-width: 200px; font-weight: 700;"
+                    data-name-id="${p.id}" value="${p.name.replace(/"/g, '&quot;')}">
+                  <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: capitalize; margin-top: 0.25rem;">${p.brand.replace('_', ' ')} • ${p.category.replace(/_/g, ' ')}</div>
                 </td>
-                <td style="padding: 0.6rem 0.8rem;">
+
+                <!-- RETAIL PRICE -->
+                <td style="padding: 0.8rem;">
                   <input type="number" class="admin-table-input" data-price-id="${p.id}" value="${p.price}">
                 </td>
-                <td style="padding: 0.6rem 0.8rem;">
+
+                <!-- CARTON RATE -->
+                <td style="padding: 0.8rem;">
                   <input type="number" class="admin-table-input" data-ctnprice-id="${p.id}" value="${p.ctnPrice}">
                 </td>
-                <td style="padding: 0.6rem 0.8rem;">
+
+                <!-- STOCK -->
+                <td style="padding: 0.8rem;">
                   <input type="number" class="admin-table-input" style="max-width: 80px;" data-stock-id="${p.id}" value="${p.stock}">
                 </td>
-                <td style="padding: 0.6rem 0.8rem; text-align: center;">
-                  <button class="btn-gold-action" style="padding: 0.4rem 0.8rem; font-size: 0.78rem;" data-action="save-product-price" data-id="${p.id}">
-                    Save Changes
+
+                <!-- SAVE BUTTON -->
+                <td style="padding: 0.8rem; text-align: center;">
+                  <button class="btn-gold-action" style="padding: 0.45rem 0.9rem; font-size: 0.78rem; white-space: nowrap;"
+                    data-action="save-product-price" data-id="${p.id}">
+                    ✓ Save Changes
                   </button>
                 </td>
               </tr>

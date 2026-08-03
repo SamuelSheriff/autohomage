@@ -10,7 +10,12 @@ ENV/
 .venv
 
 # SQLite
+*.db
 *.db-journal
+
+# Temporary / Large Uploads
+*.pdf
+DOC-*
 
 # Operating System
 .DS_Store
@@ -20,3 +25,4 @@ desktop.ini
 # IDE & Editor files
 .idea/
 *.swp
+
