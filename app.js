@@ -881,15 +881,11 @@
       const cartCount = this.cart.reduce((total, item) => total + item.qty, 0);
 
       headerContainer.innerHTML = `
-        <!-- Hotline Top Bar -->
+        <!-- Top Hotline Bar -->
         <div class="top-hotline-bar">
           <div class="hotline-group">
             <span>Official Order Hotline:</span>
             <a href="tel:${HOTLINE_PHONE}" class="hotline-link">${ICONS.phone} <span>${HOTLINE_PHONE}</span></a>
-          </div>
-          <div style="font-weight: 700; color: #fef08a; display: flex; align-items: center; gap: 1rem;">
-            <span>Quality Parts. Premium Care.</span>
-            <span style="background: var(--primary-gold); color: #fff; padding: 0.15rem 0.6rem; border-radius: 4px; font-size: 0.72rem; text-transform: uppercase;">Authorized Distributor</span>
           </div>
         </div>
 
@@ -899,19 +895,22 @@
             <img src="${OFFICIAL_LOGO}" alt="AUTO HOMAGE Official Logo" class="official-logo-img">
             <div class="brand-text-block">
               <div class="brand-title">AUTO <span>HOMAGE</span></div>
-              <div class="brand-slogan">Car Care & Accessories • Quality Parts</div>
+              <div class="brand-slogan">CAR CARE &amp; ACCESSORIES • QUALITY PARTS</div>
             </div>
           </a>
 
-          <div class="header-action-group">
-            <!-- Page Nav Tabs -->
-            ${this.activeView === 'store' ? `
-              <div class="nav-tab-group" style="margin-right: 0.5rem;">
-                <button class="nav-page-tab ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">Shop</button>
-                <button class="nav-page-tab ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">Contact Us</button>
-              </div>
-            ` : ''}
+          <!-- Center Navigation Links matching reference design -->
+          ${this.activeView === 'store' ? `
+            <nav class="center-nav-links">
+              <a href="#" class="nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">HOME</a>
+              <a href="#catalogSection" class="nav-link" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">SHOP</a>
+              <a href="#categorySection" class="nav-link" onclick="document.getElementById('categorySection')?.scrollIntoView({behavior:'smooth'})">CATEGORIES ▾</a>
+              <a href="#aboutSection" class="nav-link" onclick="document.getElementById('contactEnquiryForm')?.scrollIntoView({behavior:'smooth'})">ABOUT US</a>
+              <a href="#" class="nav-link ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">CONTACT US</a>
+            </nav>
+          ` : ''}
 
+          <div class="header-action-group">
             <a href="tel:${HOTLINE_PHONE}" class="call-hotline-btn">
               ${ICONS.phone}
               <span>Call ${HOTLINE_PHONE}</span>
@@ -1183,64 +1182,227 @@
 
       container.innerHTML = `
         <!-- HIGH IMPACT SUPERCAR HERO SHOWCASE BANNER -->
-        <section class="warm-luxury-hero" style="background: linear-gradient(135deg, rgba(28,25,23,0.94) 0%, rgba(41,37,36,0.88) 100%), url('${HERO_SUPERCAR_IMG}') center/cover no-repeat;">
-          <div>
-            <div class="hero-luxury-kicker">${ICONS.shield} Certified Genuine Automotive Care & Spares • Authorized Distributor</div>
-            <h1 class="hero-luxury-title">QUALITY PARTS. <span>PREMIUM CARE.</span></h1>
-            <p class="hero-luxury-desc">Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages & wholesale dealers across Kenya.</p>
-
-            <div class="hero-cta-group">
-              <button class="btn-gold-action" data-action="scroll-to-catalog">
-                Explore 2026 Product Catalog
-              </button>
-              <a href="tel:${HOTLINE_PHONE}" class="call-hotline-btn" style="background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.25); color: #fff;">
-                ${ICONS.phone} Order Hotline: ${HOTLINE_PHONE}
-              </a>
+        <section class="warm-luxury-hero" style="background: linear-gradient(90deg, rgba(12,10,9,0.95) 0%, rgba(28,25,23,0.85) 45%, rgba(12,10,9,0.35) 100%), url('${HERO_SUPERCAR_IMG}') right center/cover no-repeat; min-height: 520px; border-radius: 20px; padding: 3.5rem 3rem; display: flex; align-items: center; margin-bottom: 2rem; position: relative;">
+          <div style="max-width: 580px; position: relative; z-index: 2;">
+            <div class="hero-luxury-kicker" style="background: rgba(198,146,20,0.18); border: 1px solid rgba(198,146,20,0.5); color: #fef08a; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.5rem; text-transform: uppercase; margin-bottom: 1.2rem;">
+              ${ICONS.shield} CERTIFIED GENUINE AUTOMOTIVE CARE & SPARES • AUTHORIZED DISTRIBUTOR
             </div>
-          </div>
+            <h1 class="hero-luxury-title" style="font-size: 3.2rem; font-weight: 800; line-height: 1.08; margin-bottom: 1.2rem; color: #ffffff;">
+              QUALITY PARTS.<br><span style="color: var(--primary-gold); background: linear-gradient(135deg, #fef08a, #c69214); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PREMIUM CARE.</span>
+            </h1>
+            <p class="hero-luxury-desc" style="color: #d6d3d1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+              Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages &amp; wholesale dealers across Kenya.
+            </p>
 
-          <div class="hero-logo-display">
-            <div style="background: rgba(0,0,0,0.45); backdrop-filter: blur(12px); padding: 1.8rem; border-radius: 24px; border: 2px solid var(--primary-gold); box-shadow: var(--shadow-gold); text-align: center;">
-              <img src="${OFFICIAL_LOGO}" alt="Auto Homage Official Dealer Logo" style="max-height: 220px; width: auto; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));">
-              <div style="margin-top: 1rem; color: #fef08a; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.06em;">Official Dealer Registry</div>
+            <div class="hero-cta-group" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+              <button class="btn-gold-action" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})" style="padding: 0.9rem 1.8rem; font-size: 1rem;">
+                SHOP NOW →
+              </button>
+              <button class="btn-dark-outline" data-action="set-page" data-id="contact" style="padding: 0.9rem 1.8rem; font-size: 1rem;">
+                CONTACT US →
+              </button>
             </div>
           </div>
         </section>
 
-        <!-- TRUST PILLARS BAR -->
-        <div class="trust-pillars-bar">
-          <div class="trust-pillar-card">
-            <div class="trust-pillar-icon">🏆</div>
+        <!-- DARK TRUST PILLARS BAR MATCHING REFERENCE IMAGE -->
+        <div style="background: #0c0a09; border: 1px solid rgba(198,146,20,0.25); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; color: #ffffff;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="trust-pill-icon">🛡️</div>
             <div>
-              <div class="trust-pillar-title">100% Genuine Certified</div>
-              <div class="trust-pillar-desc">Direct authorized Gladiator & Flamingo importer</div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">AUTHENTIC &amp; CERTIFIED</div>
+              <div style="font-size: 0.78rem; color: #a8a29e;">100% genuine products from trusted global brands.</div>
             </div>
           </div>
 
-          <div class="trust-pillar-card">
-            <div class="trust-pillar-icon">⚡</div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="trust-pill-icon">🎖️</div>
             <div>
-              <div class="trust-pillar-title">Same-Day Nairobi Delivery</div>
-              <div class="trust-pillar-desc">1–3 business days nationwide courier service</div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">PREMIUM QUALITY</div>
+              <div style="font-size: 0.78rem; color: #a8a29e;">High-grade materials for superior performance.</div>
             </div>
           </div>
 
-          <div class="trust-pillar-card">
-            <div class="trust-pillar-icon">📦</div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="trust-pill-icon">🚚</div>
             <div>
-              <div class="trust-pillar-title">Retail & Wholesale Rates</div>
-              <div class="trust-pillar-desc">Bulk carton discounts for shops & detailers</div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">FAST &amp; RELIABLE</div>
+              <div style="font-size: 0.78rem; color: #a8a29e;">Quick delivery across Kenya.</div>
             </div>
           </div>
 
-          <div class="trust-pillar-card">
-            <div class="trust-pillar-icon">📲</div>
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="trust-pill-icon">🎧</div>
             <div>
-              <div class="trust-pillar-title">Fast M-Pesa & Card Checkout</div>
-              <div class="trust-pillar-desc">Direct phone order assistance on ${HOTLINE_PHONE}</div>
+              <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">EXPERT SUPPORT</div>
+              <div style="font-size: 0.78rem; color: #a8a29e;">Professional advice to help you choose right.</div>
             </div>
           </div>
         </div>
+
+        <!-- SHOP BY CATEGORY SHOWCASE GRID MATCHING REFERENCE IMAGE -->
+        <section id="categorySection" style="margin-bottom: 4rem;">
+          <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h2 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em;">
+              SHOP BY <span style="color: var(--primary-gold);">CATEGORY</span>
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.3rem;">Find exactly what your vehicle needs.</p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+            <!-- Card 1 -->
+            <div class="category-showcase-card" data-action="set-category" data-id="exterior_detailing" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+              <div>
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
+                  <img src="Products/Gradiator Products/Multi-Purpose Degreaser.jpg" alt="Car Care & Detailing" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <h4 style="font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; color: var(--text-main);">CAR CARE &amp; DETAILING</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Keep your car looking its best.</p>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <span class="cat-circle-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="category-showcase-card" data-action="set-category" data-id="service_maintenance" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+              <div>
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
+                  <img src="Products/Spark Plug.jpg" alt="Engine Parts" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <h4 style="font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; color: var(--text-main);">ENGINE PARTS</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Precision components for peak performance.</p>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <span class="cat-circle-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="category-showcase-card" data-action="set-category" data-id="interior_accessories" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+              <div>
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
+                  <img src="Products/Mats/Fancy Car Mat.jpg" alt="3D Mats & Interiors" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <h4 style="font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; color: var(--text-main);">3D MATS &amp; INTERIORS</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Custom fit. Maximum protection &amp; comfort.</p>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <span class="cat-circle-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="category-showcase-card" data-action="set-category" data-id="tires_wheels" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+              <div>
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
+                  <img src="Products/Wiper Blade.jpg" alt="Exterior Accessories" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <h4 style="font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; color: var(--text-main);">EXTERIOR ACCESSORIES</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Style, protection &amp; performance.</p>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <span class="cat-circle-arrow">→</span>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="category-showcase-card" data-action="set-category" data-id="tools_safety" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+              <div>
+                <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
+                  <img src="Products/Radiator Coolant.jpg" alt="Electrical & Lighting" style="max-height: 100%; object-fit: contain;">
+                </div>
+                <h4 style="font-weight: 800; font-size: 0.92rem; margin-bottom: 0.3rem; text-transform: uppercase; color: var(--text-main);">ELECTRICAL &amp; LIGHTING</h4>
+                <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 1rem;">Power up with reliable electronics.</p>
+              </div>
+              <div style="display: flex; justify-content: flex-end;">
+                <span class="cat-circle-arrow">→</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- EXCLUSIVE BRANDS. TRUSTED QUALITY. DARK SECTION MATCHING REFERENCE IMAGE -->
+        <section style="background: #0c0a09; border-radius: 20px; padding: 3rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; align-items: center;">
+          <div>
+            <h2 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; color: #ffffff; text-transform: uppercase;">
+              EXCLUSIVE BRANDS.<br><span style="color: var(--primary-gold);">TRUSTED QUALITY.</span>
+            </h2>
+            <p style="color: #a8a29e; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">
+              We partner with leading global brands to bring you the best.
+            </p>
+            <button class="btn-gold-action" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})" style="padding: 0.85rem 1.6rem;">
+              VIEW ALL PRODUCTS →
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+            <div class="brand-logo-dark-card" data-action="set-brand" data-id="gladiator">
+              <span style="font-weight: 800; font-size: 1.05rem; color: #ffffff;">GLADIATOR</span>
+              <span style="font-size: 0.68rem; color: var(--primary-gold); text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">CAR TECH</span>
+            </div>
+            <div class="brand-logo-dark-card" data-action="set-brand" data-id="flamingo">
+              <span style="font-weight: 800; font-size: 1.05rem; color: #ff6b81;">FLAMINGO</span>
+              <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">FORMULAS</span>
+            </div>
+            <div class="brand-logo-dark-card" data-action="set-brand" data-id="power_eagle">
+              <span style="font-weight: 800; font-size: 1.05rem; color: #f59e0b;">POWER EAGLE</span>
+              <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">SERIES</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- BOTTOM LIGHT FEATURE STRIP MATCHING REFERENCE IMAGE -->
+        <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; gap: 0.9rem;">
+            <div style="font-size: 1.8rem;">🚚</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">FREE DELIVERY</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">On orders over KSh 10,000</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.9rem;">
+            <div style="font-size: 1.8rem;">🛡️</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">SECURE PAYMENTS</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Safe &amp; trusted transactions</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.9rem;">
+            <div style="font-size: 1.8rem;">🎖️</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">EASY RETURNS</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">7-day return policy</div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 0.9rem;">
+            <div style="font-size: 1.8rem;">🎧</div>
+            <div>
+              <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">NEED HELP?</div>
+              <div style="font-size: 0.76rem; color: var(--text-muted);">Call ${HOTLINE_PHONE}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WHOLESALE & GARAGE PARTNERS BANNER MATCHING REFERENCE IMAGE -->
+        <section style="background: #0c0a09; border: 1.5px solid var(--border-gold); border-radius: 16px; padding: 1.8rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+          <div style="display: flex; align-items: center; gap: 1.2rem;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(198,146,20,0.2); border: 1px solid var(--primary-gold); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+              🏎️
+            </div>
+            <div>
+              <h3 style="font-weight: 800; font-size: 1.1rem; color: #ffffff; text-transform: uppercase; letter-spacing: 0.02em;">WHOLESALE &amp; GARAGE PARTNERS</h3>
+              <p style="color: #a8a29e; font-size: 0.88rem; margin-top: 0.2rem;">Bulk deals, special pricing &amp; dedicated support for garages and dealers.</p>
+            </div>
+          </div>
+
+          <a href="https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}?text=Hello%20Auto%20Homage,%20I%20am%20interested%20in%20a%20Wholesale%20/%20Garage%20Partnership" target="_blank" class="btn-dark-outline" style="padding: 0.8rem 1.6rem; text-transform: uppercase; font-size: 0.88rem;">
+            PARTNER WITH US →
+          </a>
+        </section>
 
         <!-- Vehicle Finder Card Widget -->
         <div class="warm-finder-card">
