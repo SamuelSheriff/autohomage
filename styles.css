@@ -1429,4 +1429,18 @@ header {
   .product-image-container { height: 140px; padding: 0.8rem; }
   .product-title-text { font-size: 0.88rem; }
   .btn-add-cart span { display: none; }
+
+  /* Admin Dashboard Mobile Table Touch Scroll & Responsive Layout */
+  #adminInventoryTableContainer,
+  #adminOrdersTableContainer {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+
+  .admin-table-input {
+    font-size: 0.85rem !important;
+    padding: 0.4rem 0.5rem !important;
+  }
 }
+
