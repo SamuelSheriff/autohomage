@@ -1535,4 +1535,67 @@ header {
   }
 }
 
+/* ===================== CONVERSION & TRUST BADGES ===================== */
+.badge-discount-tag {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.strike-price {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-right: 0.4rem;
+}
+
+.badge-pay-delivery {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.5rem;
+}
+
+.carton-savings-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--primary-gold-light);
+  color: var(--primary-gold-dark);
+  border: 1px solid var(--border-gold);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+  margin-top: 0.4rem;
+}
+
+.certified-genuine-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(198, 146, 20, 0.1);
+  color: var(--primary-gold-dark);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-gold);
+}
+
+
 

@@ -1653,12 +1653,21 @@
         const loadStrategy = idx < 8 ? 'eager' : 'lazy';
         const delay = (idx % 6) * 50 + 50;
 
+        // Strike-through original retail price & discount calculation
+        const origPrice = p.origPrice || Math.round(p.price * 1.18);
+        const singleSavingsPct = Math.round(((origPrice - p.price) / origPrice) * 100);
+        
+        // Carton savings vs single unit retail rate calculation
+        const singleTotal = p.price * p.pcsPerCtn;
+        const cartonSavingsPct = singleTotal > p.ctnPrice ? Math.round(((singleTotal - p.ctnPrice) / singleTotal) * 100) : 15;
+
         return `
           <div class="luxury-product-card reveal-on-scroll" data-animate="fade-up" data-delay="${delay}">
             <div class="product-image-container" data-action="view-product" data-id="${p.id}">
               <img src="${p.image}" alt="${p.name}" class="product-hero-image" loading="${loadStrategy}" decoding="async" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
               <div class="badge-tag-stack">
                 <span class="tag-brand-pill">${p.brand.replace('_', ' ')}</span>
+                ${this.priceMode === 'carton' ? `<span class="badge-discount-tag">SAVE ${cartonSavingsPct}%</span>` : (singleSavingsPct > 0 ? `<span class="badge-discount-tag">-${singleSavingsPct}% OFF</span>` : '')}
                 ${p.stock > 10 ? `<span class="badge-stock-in">In Stock</span>` : `<span class="badge-stock-low">Low Stock (${p.stock})</span>`}
               </div>
             </div>
@@ -1667,14 +1676,17 @@
               <div class="sku-code-label">SKU: ${p.code}</div>
               <h4 class="product-title-text" data-action="view-product" data-id="${p.id}">${p.name}</h4>
               
-              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--accent-amber); margin-bottom: 0.8rem;">
+              <div style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--accent-amber); margin-bottom: 0.6rem;">
                 <span>★ ${p.rating || 5.0}</span>
                 <span style="color: var(--text-muted);">(${p.reviews || 12} reviews)</span>
               </div>
 
               <div class="product-price-action-row">
                 <div>
-                  <div class="product-price-amount">KSh ${displayPrice.toLocaleString()}</div>
+                  <div style="display: flex; align-items: baseline; gap: 0.3rem;">
+                    ${this.priceMode === 'unit' && origPrice > p.price ? `<span class="strike-price">KSh ${origPrice.toLocaleString()}</span>` : ''}
+                    <div class="product-price-amount">KSh ${displayPrice.toLocaleString()}</div>
+                  </div>
                   <div style="font-size: 0.72rem; color: var(--text-muted); font-weight: 600;">${unitLabel}</div>
                 </div>
 
@@ -1687,6 +1699,10 @@
                     <span>Add</span>
                   </button>
                 </div>
+              </div>
+
+              <div class="badge-pay-delivery">
+                <span>🚚</span> Pay on Delivery in Nairobi
               </div>
             </div>
           </div>
@@ -1742,6 +1758,11 @@
       const p = this.selectedProduct;
       const displayPrice = this.priceMode === 'carton' ? p.ctnPrice : p.price;
 
+      const origPrice = p.origPrice || Math.round(p.price * 1.18);
+      const singleSavingsPct = Math.round(((origPrice - p.price) / origPrice) * 100);
+      const singleTotal = p.price * p.pcsPerCtn;
+      const cartonSavingsPct = singleTotal > p.ctnPrice ? Math.round(((singleTotal - p.ctnPrice) / singleTotal) * 100) : 15;
+
       if (!overlay) {
         overlay = document.createElement('div');
         overlay.id = 'productModalOverlay';
@@ -1754,8 +1775,12 @@
           <button class="close-btn-round" data-action="close-modal">✕</button>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; align-items: center;">
-            <div style="background: radial-gradient(circle, #ffffff 40%, #f7f1e5 100%); border-radius: var(--radius-lg); padding: 2rem; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid var(--border-gold);">
+            <div style="background: radial-gradient(circle, #ffffff 40%, #f7f1e5 100%); border-radius: var(--radius-lg); padding: 2rem; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid var(--border-gold); position: relative;">
               <img src="${p.image}" alt="${p.name}" style="max-height: 100%; max-width: 100%; object-fit: contain;" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+              <div style="position: absolute; top: 1rem; left: 1rem; display: flex; flex-direction: column; gap: 0.4rem;">
+                <span class="certified-genuine-tag">🛡️ 100% Certified Genuine</span>
+                ${this.priceMode === 'carton' ? `<span class="carton-savings-pill">📦 Save ${cartonSavingsPct}% on Wholesale Carton</span>` : `<span class="badge-discount-tag">-${singleSavingsPct}% OFF</span>`}
+              </div>
             </div>
 
             <div>
@@ -1764,17 +1789,23 @@
               <p style="color: var(--text-body); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.6;">${p.description}</p>
 
               <div style="background: var(--bg-warm-gold); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 1.2rem; margin-bottom: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                  <span style="color: var(--text-muted);">Retail Price:</span>
-                  <strong style="color: var(--bg-dark-obsidian);">KSh ${p.price.toLocaleString()}</strong>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                  <span style="color: var(--text-muted);">Retail Single Unit:</span>
+                  <div>
+                    <span class="strike-price">KSh ${origPrice.toLocaleString()}</span>
+                    <strong style="color: var(--bg-dark-obsidian); font-size: 1.1rem;">KSh ${p.price.toLocaleString()}</strong>
+                  </div>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                   <span style="color: var(--text-muted);">Wholesale Carton Rate:</span>
                   <strong style="color: var(--primary-gold-dark);">KSh ${p.ctnPrice.toLocaleString()} (${p.pcsPerCtn} pcs/ctn)</strong>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
                   <span style="color: var(--text-muted);">Stock Status:</span>
                   <strong style="color: var(--accent-emerald);">${p.stock} units available</strong>
+                </div>
+                <div class="badge-pay-delivery" style="margin-top: 0.8rem;">
+                  <span>🚚</span> Pay on Delivery Available in Nairobi & Environs
                 </div>
               </div>
 
