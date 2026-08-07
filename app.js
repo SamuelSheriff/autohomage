@@ -1429,6 +1429,7 @@
         this.nextHeroSlide();
       }, 5000);
 
+      // Pause auto-advance on desktop hover
       sliderContainer.addEventListener('mouseenter', () => {
         if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
       });
@@ -1438,6 +1439,35 @@
           this.nextHeroSlide();
         }, 5000);
       });
+
+      // Mobile Touch Swipe Gesture Support
+      let touchStartX = 0;
+      let touchEndX = 0;
+
+      sliderContainer.addEventListener('touchstart', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          touchStartX = e.changedTouches[0].screenX;
+        }
+        if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
+      }, { passive: true });
+
+      sliderContainer.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches[0]) {
+          touchEndX = e.changedTouches[0].screenX;
+          const diff = touchStartX - touchEndX;
+          if (Math.abs(diff) > 40) {
+            if (diff > 0) {
+              this.nextHeroSlide();
+            } else {
+              this.prevHeroSlide();
+            }
+          }
+        }
+        if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
+        this.heroSlideTimer = setInterval(() => {
+          this.nextHeroSlide();
+        }, 5000);
+      }, { passive: true });
     }
 
     nextHeroSlide() {
