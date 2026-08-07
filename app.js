@@ -1717,12 +1717,12 @@
         </section>
 
         <!-- EXCLUSIVE BRANDS. TRUSTED QUALITY. DARK SECTION MATCHING REFERENCE IMAGE -->
-        <section class="reveal-on-scroll" data-animate="fade-up" style="background: #0c0a09; border-radius: 20px; padding: 3rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; align-items: center;">
-          <div class="reveal-on-scroll" data-animate="slide-right" data-delay="100">
-            <h2 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; color: #ffffff; text-transform: uppercase;">
-              EXCLUSIVE BRANDS.<br><span style="color: var(--primary-gold);">TRUSTED QUALITY.</span>
+        <section class="exclusive-brands-banner reveal-on-scroll" data-animate="fade-up">
+          <div class="exclusive-brands-header reveal-on-scroll" data-animate="slide-right" data-delay="100">
+            <h2 class="exclusive-brands-title">
+              EXCLUSIVE BRANDS.<br><span>TRUSTED QUALITY.</span>
             </h2>
-            <p style="color: #a8a29e; font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5;">
+            <p class="exclusive-brands-desc">
               We partner with leading global brands to bring you the best.
             </p>
             <button class="btn-gold-action" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})" style="padding: 0.85rem 1.6rem;">
@@ -1730,18 +1730,18 @@
             </button>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+          <div class="exclusive-brands-grid">
             <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="150" data-action="set-brand" data-id="gladiator">
-              <span style="font-weight: 800; font-size: 1.05rem; color: #ffffff;">GLADIATOR</span>
-              <span style="font-size: 0.68rem; color: var(--primary-gold); text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">CAR TECH</span>
+              <span class="brand-logo-name" style="color: #ffffff;">GLADIATOR</span>
+              <span class="brand-logo-sub" style="color: var(--primary-gold);">CAR TECH</span>
             </div>
             <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="200" data-action="set-brand" data-id="flamingo">
-              <span style="font-weight: 800; font-size: 1.05rem; color: #ff6b81;">FLAMINGO</span>
-              <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">FORMULAS</span>
+              <span class="brand-logo-name" style="color: #ff6b81;">FLAMINGO</span>
+              <span class="brand-logo-sub" style="color: #a8a29e;">FORMULAS</span>
             </div>
             <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="250" data-action="set-brand" data-id="power_eagle">
-              <span style="font-weight: 800; font-size: 1.05rem; color: #f59e0b;">POWER EAGLE</span>
-              <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">SERIES</span>
+              <span class="brand-logo-name" style="color: #f59e0b;">POWER EAGLE</span>
+              <span class="brand-logo-sub" style="color: #a8a29e;">SERIES</span>
             </div>
           </div>
         </section>
