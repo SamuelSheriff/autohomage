@@ -293,16 +293,18 @@
 
           case 'set-brand':
             this.activeBrand = id;
+            this.activePage = 'shop';
             this.currentPage = 1;
-            this.renderStorefront();
-            document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
+            this.render();
+            setTimeout(() => document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' }), 80);
             break;
 
           case 'set-category':
             this.activeCategory = id;
+            this.activePage = 'shop';
             this.currentPage = 1;
-            this.renderStorefront();
-            document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
+            this.render();
+            setTimeout(() => document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' }), 80);
             break;
 
           case 'set-pricemode':
@@ -886,6 +888,8 @@
         this.renderAdminDashboard();
       } else if (this.activePage === 'contact') {
         this.renderContactPage();
+      } else if (this.activePage === 'about') {
+        this.renderAboutPage();
       } else {
         this.renderStorefront();
       }
@@ -944,7 +948,7 @@
               <a href="#" class="nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">HOME</a>
               <a href="#catalogSection" class="nav-link" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">SHOP</a>
               <a href="#categorySection" class="nav-link" onclick="document.getElementById('categorySection')?.scrollIntoView({behavior:'smooth'})">CATEGORIES ▾</a>
-              <a href="#aboutSection" class="nav-link" onclick="document.getElementById('contactEnquiryForm')?.scrollIntoView({behavior:'smooth'})">ABOUT US</a>
+              <a href="#" class="nav-link ${this.activePage === 'about' ? 'active' : ''}" data-action="set-page" data-id="about">ABOUT US</a>
               <a href="#" class="nav-link ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">CONTACT US</a>
             </nav>
           ` : ''}
@@ -1063,6 +1067,138 @@
       `;
 
       container.appendChild(footer);
+    }
+
+    renderAboutPage() {
+      const container = document.getElementById('appContent');
+      container.innerHTML = `
+        <!-- ABOUT HERO -->
+        <div class="about-hero reveal-on-scroll" data-animate="fade-up">
+          <div class="about-hero-badge">🏆 Kenya's Trusted Car Care Distributor</div>
+          <h1>About <span>Auto Homage</span></h1>
+          <p>We are Kenya's premier official distributor of world-class automotive care products — bringing Gladiator Car Tech, Flamingo, and Power Eagle to garages, car dealers, and everyday drivers across the country.</p>
+        </div>
+
+        <!-- OUR STORY SECTION -->
+        <section class="about-story-section reveal-on-scroll" data-animate="fade-up" data-delay="100">
+          <div class="about-story-img-col">
+            <div class="about-story-img-frame">
+              <img src="logo.png" alt="Auto Homage Logo" class="about-story-logo-img">
+              <div class="about-story-img-glow"></div>
+            </div>
+            <div class="about-stat-cards">
+              <div class="about-stat-card reveal-on-scroll" data-animate="zoom-in" data-delay="150">
+                <div class="about-stat-number">500+</div>
+                <div class="about-stat-label">Products in Catalog</div>
+              </div>
+              <div class="about-stat-card reveal-on-scroll" data-animate="zoom-in" data-delay="200">
+                <div class="about-stat-number">3</div>
+                <div class="about-stat-label">Premium Brands</div>
+              </div>
+              <div class="about-stat-card reveal-on-scroll" data-animate="zoom-in" data-delay="250">
+                <div class="about-stat-number">47+</div>
+                <div class="about-stat-label">Counties Served</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="about-story-text-col">
+            <div class="about-section-eyebrow">Our Story</div>
+            <h2>Built on a Passion for <span>Automotive Excellence</span></h2>
+            <p>Auto Homage was founded with a clear mission: to make premium automotive care products accessible to every Kenyan driver, mechanic, and auto dealer — without compromise on quality or authenticity.</p>
+            <p>We are the official authorized distributor for <strong>Gladiator Car Tech</strong>, <strong>Flamingo Formulas</strong>, and <strong>Power Eagle</strong> — trusted names with global recognition and decades of innovation behind them.</p>
+            <p>From Nairobi to Mombasa, Kisumu to Eldoret — we deliver directly to your door, offering both retail and wholesale carton pricing to serve individuals and businesses alike.</p>
+            <a href="#" class="btn-gold-solid about-cta-btn" data-action="set-page" data-id="shop">🛒 Browse Our Products</a>
+          </div>
+        </section>
+
+        <!-- MISSION & VALUES -->
+        <section class="about-values-section">
+          <div class="reveal-on-scroll" data-animate="fade-up" style="text-align: center; margin-bottom: 2.8rem;">
+            <div class="about-section-eyebrow">What Drives Us</div>
+            <h2>Our Mission &amp; <span style="color: var(--primary-gold);">Core Values</span></h2>
+          </div>
+          <div class="about-values-grid">
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="100">
+              <div class="about-value-icon">🛡️</div>
+              <h4>100% Authenticity</h4>
+              <p>Every product we sell is sourced directly from authorized brand channels. No counterfeits. No compromise.</p>
+            </div>
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="150">
+              <div class="about-value-icon">🚀</div>
+              <h4>Fast Nationwide Delivery</h4>
+              <p>We ship to all 47 counties in Kenya, with same-day Pay on Delivery available in Nairobi and environs.</p>
+            </div>
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="200">
+              <div class="about-value-icon">💡</div>
+              <h4>Expert Guidance</h4>
+              <p>Our team helps you choose the exact right product for your vehicle make and model — saving you time and money.</p>
+            </div>
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="250">
+              <div class="about-value-icon">🤝</div>
+              <h4>Wholesale Partnerships</h4>
+              <p>We work with garages, auto dealers, and spare part shops offering bulk carton pricing and dedicated distributor support.</p>
+            </div>
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="300">
+              <div class="about-value-icon">⭐</div>
+              <h4>Customer Satisfaction</h4>
+              <p>Every order matters to us. We follow up on deliveries and welcome feedback to continuously improve your experience.</p>
+            </div>
+            <div class="about-value-card reveal-on-scroll" data-animate="zoom-in" data-delay="350">
+              <div class="about-value-icon">🇰🇪</div>
+              <h4>Proudly Kenyan</h4>
+              <p>We are a locally grown business committed to improving Kenya's automotive culture — one quality product at a time.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- BRAND PARTNERS -->
+        <section class="about-brands-section reveal-on-scroll" data-animate="fade-up">
+          <div style="text-align: center; margin-bottom: 2.5rem;">
+            <div class="about-section-eyebrow">Authorized Distributor</div>
+            <h2>Our <span style="color: var(--primary-gold);">Brand Partners</span></h2>
+            <p style="color: var(--text-muted); max-width: 520px; margin: 0.5rem auto 0;">We carry only the best. These are the world-class brands behind every product we stock.</p>
+          </div>
+          <div class="about-brands-grid">
+            <div class="about-brand-card reveal-on-scroll" data-animate="slide-right" data-delay="100">
+              <div class="about-brand-emblem">🔴</div>
+              <h4>Gladiator Car Tech</h4>
+              <p>Professional-grade car care formulas — wax, polish, degreaser, and detailing compounds trusted by expert detailers across Africa.</p>
+              <a href="#" class="about-brand-link" data-action="set-brand" data-id="gladiator">Explore Gladiator →</a>
+            </div>
+            <div class="about-brand-card reveal-on-scroll" data-animate="fade-up" data-delay="150">
+              <div class="about-brand-emblem">🦩</div>
+              <h4>Flamingo Products</h4>
+              <p>High-performance cleaning agents and surface care products, renowned for their effectiveness on both interior and exterior surfaces.</p>
+              <a href="#" class="about-brand-link" data-action="set-brand" data-id="flamingo">Explore Flamingo →</a>
+            </div>
+            <div class="about-brand-card reveal-on-scroll" data-animate="slide-left" data-delay="200">
+              <div class="about-brand-emblem">🦅</div>
+              <h4>Power Eagle</h4>
+              <p>Robust automotive accessories and vehicle care solutions engineered for durability in Kenya's diverse road conditions.</p>
+              <a href="#" class="about-brand-link" data-action="set-brand" data-id="power_eagle">Explore Power Eagle →</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- CALL TO ACTION BANNER -->
+        <section class="about-cta-banner reveal-on-scroll" data-animate="zoom-in">
+          <div class="about-cta-content">
+            <h2>Ready to Experience <span>Premium Car Care?</span></h2>
+            <p>Browse over 500+ authentic products. Nationwide delivery. Pay on Delivery in Nairobi.</p>
+            <div class="about-cta-buttons">
+              <a href="#" class="btn-gold-solid" data-action="set-page" data-id="shop" style="padding: 1rem 2.2rem; font-size: 1.05rem;">🛒 Shop Now</a>
+              <a href="https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}" target="_blank"
+                 style="display: inline-flex; align-items: center; gap: 0.5rem; background: #25D366; color: #fff; padding: 1rem 2rem; border-radius: 9999px; font-weight: 800; font-size: 1rem; text-decoration: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp Us
+              </a>
+            </div>
+          </div>
+        </section>
+      `;
+      this.renderFooter();
+      this.initScrollObserver();
     }
 
     renderContactPage() {
