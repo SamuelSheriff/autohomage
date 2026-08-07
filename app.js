@@ -1039,7 +1039,7 @@
 
             <!-- Hide Admin Portal trigger button from regular customers when unauthenticated -->
             ${this.isAdminAuthenticated ? `
-              <button class="admin-portal-btn admin-visible-mobile" data-action="toggle-view" style="border-color: #22c55e;">
+              <button class="admin-portal-btn" data-action="toggle-view" style="border-color: #22c55e;">
                 ${ICONS.lock}
                 <span>${this.activeView === 'store' ? 'Admin Portal' : 'Back to Store'}</span>
               </button>
@@ -2052,8 +2052,8 @@
                     💬
                   </button>
                   <button class="btn-add-cart" data-action="add-to-cart" data-id="${p.id}">
-                    <span class="btn-cart-icon">${ICONS.cart}</span>
-                    <span class="btn-cart-label">Add</span>
+                    ${ICONS.cart}
+                    <span>Add</span>
                   </button>
                 </div>
               </div>
