@@ -127,6 +127,9 @@
       this.currentHeroSlide = 0;
       this.heroSlideTimer = null;
 
+      // Mobile Navigation Drawer State
+      this.isMobileMenuOpen = false;
+
       // Admin Authentication & Sub-Tab State
       this.adminPassword = localStorage.getItem('autohomage_admin_password') || '@Angel10';
       this.isAdminAuthenticated = sessionStorage.getItem('autohomage_admin_auth') === 'true';
@@ -329,8 +332,19 @@
           case 'set-page':
             this.activePage = id;
             this.activeView = 'store';
+            this.isMobileMenuOpen = false;
             this.render();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            break;
+
+          case 'toggle-mobile-menu':
+            this.isMobileMenuOpen = !this.isMobileMenuOpen;
+            this.renderHeader();
+            break;
+
+          case 'close-mobile-menu':
+            this.isMobileMenuOpen = false;
+            this.renderHeader();
             break;
 
           case 'open-cart':
@@ -1037,9 +1051,35 @@
                 <span>Cart</span>
                 <span class="cart-count-badge" id="cartBadgeCount">${cartCount}</span>
               </button>
+
+              <!-- Mobile Hamburger Menu Button -->
+              <button class="mobile-menu-trigger" data-action="toggle-mobile-menu" aria-label="Toggle Mobile Navigation">
+                ${this.isMobileMenuOpen ? '✕' : '☰'}
+              </button>
             ` : ''}
           </div>
         </div>
+
+        <!-- Collapsible Mobile Navigation Drawer -->
+        ${(this.activeView === 'store' && this.isMobileMenuOpen) ? `
+          <nav class="mobile-nav-menu">
+            <a href="#" class="mobile-nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">
+              <span>🏠</span> HOME
+            </a>
+            <a href="#catalogSection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+              <span>🛒</span> SHOP CATALOG
+            </a>
+            <a href="#categorySection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('categorySection')?.scrollIntoView({behavior:'smooth'})">
+              <span>🏷️</span> CATEGORIES
+            </a>
+            <a href="#" class="mobile-nav-link ${this.activePage === 'about' ? 'active' : ''}" data-action="set-page" data-id="about">
+              <span>🏆</span> ABOUT US
+            </a>
+            <a href="#" class="mobile-nav-link ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">
+              <span>📞</span> CONTACT US
+            </a>
+          </nav>
+        ` : ''}
       `;
     }
 
