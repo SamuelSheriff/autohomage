@@ -1528,9 +1528,6 @@
             `).join('')}
           </div>
         </section>
-      `;
-
-      this.initHeroSlider();
 
         <!-- DARK TRUST PILLARS BAR MATCHING REFERENCE IMAGE -->
         <div class="reveal-on-scroll" data-animate="fade-up" data-delay="150" style="background: #0c0a09; border: 1px solid rgba(198,146,20,0.25); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; color: #ffffff;">
@@ -1866,6 +1863,8 @@
           </div>
         </div>
       `;
+
+      this.initHeroSlider();
 
       const makeSelect = document.getElementById('ymmMakeSelect');
       const modelSelect = document.getElementById('ymmModelSelect');
