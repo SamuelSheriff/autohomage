@@ -771,80 +771,6 @@ header {
   background: linear-gradient(135deg, #b45309, #9e730d);
   transform: translateY(-1px);
   box-shadow: 0 12px 28px -4px rgba(198, 146, 20, 0.35);
-/* ===================== EXCLUSIVE BRANDS BANNER ===================== */
-.exclusive-brands-banner {
-  background: #0c0a09;
-  border-radius: var(--radius-xl);
-  padding: 3rem 2.5rem;
-  margin-bottom: 3.5rem;
-  color: #ffffff;
-  display: grid;
-  grid-template-columns: 1fr 1.5fr;
-  gap: 2.5rem;
-  align-items: center;
-  border: 1px solid rgba(198, 146, 20, 0.3);
-}
-
-.exclusive-brands-title {
-  font-family: var(--font-heading);
-  font-size: 2.1rem;
-  font-weight: 800;
-  line-height: 1.15;
-  margin-bottom: 1rem;
-  color: #ffffff;
-  text-transform: uppercase;
-}
-
-.exclusive-brands-title span {
-  color: var(--primary-gold);
-}
-
-.exclusive-brands-desc {
-  color: #a8a29e;
-  font-size: 0.95rem;
-  margin-bottom: 2rem;
-  line-height: 1.5;
-}
-
-.exclusive-brands-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.2rem;
-}
-
-.brand-logo-dark-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(198, 146, 20, 0.3);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem 1rem;
-  text-align: center;
-  cursor: pointer;
-  transition: var(--transition);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.brand-logo-dark-card:hover {
-  background: rgba(198, 146, 20, 0.15);
-  border-color: var(--primary-gold);
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(198, 146, 20, 0.2);
-}
-
-.brand-logo-name {
-  font-weight: 800;
-  font-size: 1.1rem;
-  letter-spacing: 0.02em;
-}
-
-.brand-logo-sub {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  font-weight: 700;
-  margin-top: 0.25rem;
-  letter-spacing: 0.06em;
 }
 
 /* ===================== BRAND SHOWCASE ===================== */
@@ -1804,85 +1730,25 @@ header {
   .contact-hero { padding: 2rem 1.5rem; }
 }
 
-  /* Exclusive Brands Section Mobile Styling */
-  .exclusive-brands-banner {
-    grid-template-columns: 1fr;
-    padding: 2rem 1.2rem;
-    gap: 1.6rem;
-    text-align: center;
-  }
-  .exclusive-brands-title {
-    font-size: 1.6rem;
-    line-height: 1.2;
-    white-space: normal;
-  }
-  .exclusive-brands-desc {
-    font-size: 0.9rem;
-    margin-bottom: 1.4rem;
-  }
-  .exclusive-brands-banner .btn-gold-action {
-    width: 100%;
-    justify-content: center;
-  }
-  .exclusive-brands-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
-  }
-  .brand-logo-dark-card {
-    padding: 1rem 0.5rem;
-  }
-  .brand-logo-name { font-size: 0.88rem; }
-  .brand-logo-sub { font-size: 0.62rem; }
+@media (max-width: 480px) {
+  .brand-showcase-grid { grid-template-columns: 1fr; }
+  .finder-grid { grid-template-columns: 1fr; }
 
-  /* Catalog Filter Bar Mobile Styling */
-  .catalog-filter-bar {
-    padding: 1rem;
-    gap: 0.8rem;
-  }
-  .bar-row-upper {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.8rem;
-  }
-  /* Brand Filter Tabs horizontal swipe container */
-  .bar-row-upper > div:first-child {
-    display: flex !important;
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
-    padding-bottom: 0.4rem;
-    gap: 0.4rem;
-    flex-wrap: nowrap !important;
-  }
-  .brand-tab-btn {
-    flex-shrink: 0;
-    white-space: nowrap;
-    padding: 0.5rem 0.85rem;
-    font-size: 0.82rem;
-  }
+  /* Product grid: still 2 columns but more compact */
+  .products-display-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .product-image-container { height: 130px; padding: 0.7rem; }
+  .product-info-body { padding: 0.7rem; }
+  .product-title-text { font-size: 0.82rem; -webkit-line-clamp: 2; }
+  .sku-code-label { display: none; }
+  .product-price-amount { font-size: 1rem; }
+  /* Star ratings: hide review count on tiny screens */
+  .product-info-body > div[style*="amber"] span:last-child { display: none; }
+  /* Hide Pay on Delivery badge on tiny screens */
+  .badge-pay-delivery { display: none; }
 
-  /* Price Mode Switcher (Single Unit Retail vs Wholesale Carton) full width */
-  .price-mode-switch {
-    width: 100%;
-    display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    border-radius: var(--radius-md);
-  }
-  .switch-option {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-    padding: 0.6rem 0.4rem;
-    font-size: 0.8rem;
-    white-space: nowrap;
-  }
-
-  /* Search input full width */
-  .bar-row-upper > div:last-child {
-    width: 100% !important;
-    min-width: 100% !important;
-  }
+  /* Cart icon always visible; hide text label only */
+  .btn-add-cart .btn-cart-label { display: none; }
+  .btn-add-cart { padding: 0.55rem 0.7rem; }
 
   /* Admin Dashboard Mobile Table Touch Scroll & Responsive Layout */
   #adminInventoryTableContainer,
@@ -1894,20 +1760,6 @@ header {
   .admin-table-input {
     font-size: 0.85rem !important;
     padding: 0.4rem 0.5rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .exclusive-brands-grid {
-    grid-template-columns: 1fr;
-    gap: 0.6rem;
-  }
-  .brand-logo-dark-card {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem 1.2rem;
-    width: 100%;
   }
 }
 
