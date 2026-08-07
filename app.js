@@ -37,6 +37,54 @@
   const OFFICIAL_EMAIL = 'autohomage@gmail.com';
   const SOCIAL_HANDLE = 'Auto Homage';
 
+  const HERO_SLIDES = [
+    {
+      id: 0,
+      image: 'Hero Image Carousel/hero_car.png',
+      kicker: '🛡️ CERTIFIED GENUINE AUTOMOTIVE CARE & SPARES • AUTHORIZED DISTRIBUTOR',
+      title: 'QUALITY PARTS.<br><span class="hero-gold-gradient">PREMIUM CARE.</span>',
+      desc: 'Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages & wholesale dealers across Kenya.',
+      btnPrimary: { text: 'SHOP NOW →', action: 'scroll-to-catalog' },
+      btnSecondary: { text: 'CONTACT US →', action: 'set-page', id: 'contact' }
+    },
+    {
+      id: 1,
+      image: 'Hero Image Carousel/Products Showcase.png',
+      kicker: '✨ GLADIATOR & FLAMINGO OFFICIAL CATALOG',
+      title: 'PREMIUM DETAILING &<br><span class="hero-gold-gradient">CAR CARE FORMULAS</span>',
+      desc: 'Keep your vehicle showroom clean with multi-purpose degreasers, tyre shines, dashboard polishes, and ceramic spray wax. Wholesale carton rates available.',
+      btnPrimary: { text: 'SHOP DETAILING →', action: 'set-category', id: 'exterior_detailing' },
+      btnSecondary: { text: 'CALL HOTLINE', href: `tel:${HOTLINE_PHONE}` }
+    },
+    {
+      id: 2,
+      image: 'Hero Image Carousel/Interior & Mats.png',
+      kicker: '🚗 CUSTOM VEHICLE ACCESSORIES',
+      title: 'CUSTOM FIT 3D MATS &<br><span class="hero-gold-gradient">LUXURY INTERIORS</span>',
+      desc: 'All-weather 3D bucket floor mats, premium leather steering covers, and interior protections tailor-made for your vehicle make, model, and year.',
+      btnPrimary: { text: 'EXPLORE MATS →', action: 'set-category', id: 'interior_accessories' },
+      btnSecondary: { text: 'SELECT YOUR VEHICLE', action: 'scroll-to-catalog' }
+    },
+    {
+      id: 3,
+      image: 'Hero Image Carousel/Mechanic Scene.png',
+      kicker: '🔧 ENGINE & BRAKE MAINTENANCE',
+      title: 'PRECISION SERVICE &<br><span class="hero-gold-gradient">GENUINE OEM SPARES</span>',
+      desc: 'High-durability iridium spark plugs, ceramic brake pads, oil filters, and suspension parts for smooth, reliable performance on Kenya roads.',
+      btnPrimary: { text: 'SHOP ENGINE SPARES →', action: 'set-category', id: 'service_maintenance' },
+      btnSecondary: { text: 'WHOLESALE CARTON RATES', action: 'set-pricemode', id: 'carton' }
+    },
+    {
+      id: 4,
+      image: 'Hero Image Carousel/Speedometer.png',
+      kicker: '🚀 NATIONWIDE EXPRESS DELIVERY',
+      title: 'FAST DELIVERY ACROSS<br><span class="hero-gold-gradient">ALL 47 COUNTIES</span>',
+      desc: 'Same-day Pay on Delivery in Nairobi & environs. Bulk wholesale carton discounts available for garages, auto dealers, and spare part retailers.',
+      btnPrimary: { text: 'ORDER VIA WHATSAPP', href: `https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}` },
+      btnSecondary: { text: 'ABOUT AUTO HOMAGE', action: 'set-page', id: 'about' }
+    }
+  ];
+
   const ICONS = {
     car: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>`,
     cart: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>`,
@@ -74,6 +122,10 @@
       this.isCartOpen = false;
       this.isCheckoutOpen = false;
       this.viewingOrder = null;
+
+      // Hero Slider State
+      this.currentHeroSlide = 0;
+      this.heroSlideTimer = null;
 
       // Admin Authentication & Sub-Tab State
       this.adminPassword = localStorage.getItem('autohomage_admin_password') || '@Angel10';
@@ -363,6 +415,18 @@
 
           case 'scroll-to-catalog':
             document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
+            break;
+
+          case 'prev-hero-slide':
+            this.prevHeroSlide();
+            break;
+
+          case 'next-hero-slide':
+            this.nextHeroSlide();
+            break;
+
+          case 'set-hero-slide':
+            this.goToHeroSlide(parseInt(id));
             break;
         }
       });
@@ -1352,33 +1416,121 @@
       this.showToast('Opening WhatsApp with your enquiry...');
     }
 
+    initHeroSlider() {
+      if (this.heroSlideTimer) {
+        clearInterval(this.heroSlideTimer);
+        this.heroSlideTimer = null;
+      }
+
+      const sliderContainer = document.getElementById('heroSliderContainer');
+      if (!sliderContainer) return;
+
+      this.heroSlideTimer = setInterval(() => {
+        this.nextHeroSlide();
+      }, 5000);
+
+      sliderContainer.addEventListener('mouseenter', () => {
+        if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
+      });
+      sliderContainer.addEventListener('mouseleave', () => {
+        if (this.heroSlideTimer) clearInterval(this.heroSlideTimer);
+        this.heroSlideTimer = setInterval(() => {
+          this.nextHeroSlide();
+        }, 5000);
+      });
+    }
+
+    nextHeroSlide() {
+      this.currentHeroSlide = (this.currentHeroSlide + 1) % HERO_SLIDES.length;
+      this.updateHeroSlideDOM();
+    }
+
+    prevHeroSlide() {
+      this.currentHeroSlide = (this.currentHeroSlide - 1 + HERO_SLIDES.length) % HERO_SLIDES.length;
+      this.updateHeroSlideDOM();
+    }
+
+    goToHeroSlide(index) {
+      this.currentHeroSlide = index;
+      this.updateHeroSlideDOM();
+    }
+
+    updateHeroSlideDOM() {
+      const slides = document.querySelectorAll('.hero-slide-item');
+      const dots = document.querySelectorAll('.hero-slider-dot');
+
+      slides.forEach((slide, idx) => {
+        if (idx === this.currentHeroSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      dots.forEach((dot, idx) => {
+        if (idx === this.currentHeroSlide) {
+          dot.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+        }
+      });
+    }
+
     renderStorefront() {
       const container = document.getElementById('appContent');
 
       container.innerHTML = `
-        <!-- HIGH IMPACT SUPERCAR HERO SHOWCASE BANNER -->
-        <section class="warm-luxury-hero reveal-on-scroll" data-animate="fade-up" style="background: linear-gradient(90deg, rgba(12,10,9,0.95) 0%, rgba(28,25,23,0.85) 45%, rgba(12,10,9,0.35) 100%), url('${HERO_SUPERCAR_IMG}') right center/cover no-repeat; min-height: 520px; border-radius: 20px; padding: 3.5rem 3rem; display: flex; align-items: center; margin-bottom: 2rem; position: relative;">
-          <div style="max-width: 580px; position: relative; z-index: 2;">
-            <div class="hero-luxury-kicker reveal-on-scroll" data-animate="fade-up" data-delay="100" style="background: rgba(198,146,20,0.18); border: 1px solid rgba(198,146,20,0.5); color: #fef08a; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.5rem; text-transform: uppercase; margin-bottom: 1.2rem;">
-              ${ICONS.shield} CERTIFIED GENUINE AUTOMOTIVE CARE & SPARES • AUTHORIZED DISTRIBUTOR
-            </div>
-            <h1 class="hero-luxury-title reveal-on-scroll" data-animate="fade-up" data-delay="150" style="font-size: 3.2rem; font-weight: 800; line-height: 1.08; margin-bottom: 1.2rem; color: #ffffff;">
-              QUALITY PARTS.<br><span style="color: var(--primary-gold); background: linear-gradient(135deg, #fef08a, #c69214); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PREMIUM CARE.</span>
-            </h1>
-            <p class="hero-luxury-desc reveal-on-scroll" data-animate="fade-up" data-delay="200" style="color: #d6d3d1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
-              Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages &amp; wholesale dealers across Kenya.
-            </p>
+        <!-- HIGH IMPACT AUTOMOTIVE HERO CAROUSEL SLIDER -->
+        <section id="heroSliderContainer" class="hero-slider-wrapper reveal-on-scroll" data-animate="fade-up">
+          <div class="hero-slider-track">
+            ${HERO_SLIDES.map((slide, idx) => `
+              <div class="hero-slide-item ${idx === this.currentHeroSlide ? 'active' : ''}" style="background-image: linear-gradient(90deg, rgba(12,10,9,0.94) 0%, rgba(28,25,23,0.85) 50%, rgba(12,10,9,0.3) 100%), url('${slide.image}');">
+                <div class="hero-slide-content">
+                  <div class="hero-luxury-kicker">
+                    ${slide.kicker}
+                  </div>
+                  <h1 class="hero-luxury-title">${slide.title}</h1>
+                  <p class="hero-luxury-desc">${slide.desc}</p>
+                  <div class="hero-cta-group">
+                    ${slide.btnPrimary.href ? `
+                      <a href="${slide.btnPrimary.href}" target="_blank" class="btn-gold-solid" style="padding: 0.9rem 1.8rem; font-size: 1rem; text-decoration: none;">
+                        ${slide.btnPrimary.text}
+                      </a>
+                    ` : `
+                      <button class="btn-gold-action" ${slide.btnPrimary.action ? `data-action="${slide.btnPrimary.action}"` : ''} ${slide.btnPrimary.id ? `data-id="${slide.btnPrimary.id}"` : ''} style="padding: 0.9rem 1.8rem; font-size: 1rem;">
+                        ${slide.btnPrimary.text}
+                      </button>
+                    `}
+                    
+                    ${slide.btnSecondary.href ? `
+                      <a href="${slide.btnSecondary.href}" ${slide.btnSecondary.href.startsWith('http') ? 'target="_blank"' : ''} class="btn-dark-outline" style="padding: 0.9rem 1.8rem; font-size: 1rem; text-decoration: none;">
+                        ${slide.btnSecondary.text}
+                      </a>
+                    ` : `
+                      <button class="btn-dark-outline" ${slide.btnSecondary.action ? `data-action="${slide.btnSecondary.action}"` : ''} ${slide.btnSecondary.id ? `data-id="${slide.btnSecondary.id}"` : ''} style="padding: 0.9rem 1.8rem; font-size: 1rem;">
+                        ${slide.btnSecondary.text}
+                      </button>
+                    `}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
 
-            <div class="hero-cta-group reveal-on-scroll" data-animate="fade-up" data-delay="250" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-              <button class="btn-gold-action" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})" style="padding: 0.9rem 1.8rem; font-size: 1rem;">
-                SHOP NOW →
-              </button>
-              <button class="btn-dark-outline" data-action="set-page" data-id="contact" style="padding: 0.9rem 1.8rem; font-size: 1rem;">
-                CONTACT US →
-              </button>
-            </div>
+          <!-- Navigation Arrows -->
+          <button class="hero-slider-arrow hero-slider-prev" data-action="prev-hero-slide" aria-label="Previous Slide">❮</button>
+          <button class="hero-slider-arrow hero-slider-next" data-action="next-hero-slide" aria-label="Next Slide">❯</button>
+
+          <!-- Navigation Dots -->
+          <div class="hero-slider-dots">
+            ${HERO_SLIDES.map((_, idx) => `
+              <button class="hero-slider-dot ${idx === this.currentHeroSlide ? 'active' : ''}" data-action="set-hero-slide" data-id="${idx}" aria-label="Slide ${idx + 1}"></button>
+            `).join('')}
           </div>
         </section>
+      `;
+
+      this.initHeroSlider();
 
         <!-- DARK TRUST PILLARS BAR MATCHING REFERENCE IMAGE -->
         <div class="reveal-on-scroll" data-animate="fade-up" data-delay="150" style="background: #0c0a09; border: 1px solid rgba(198,146,20,0.25); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; color: #ffffff;">
