@@ -838,6 +838,44 @@
       setTimeout(() => toast.remove(), 3500);
     }
 
+    initScrollObserver() {
+      setTimeout(() => {
+        const elements = document.querySelectorAll('.reveal-on-scroll');
+        if (!elements.length) return;
+
+        if ('IntersectionObserver' in window) {
+          if (this.scrollObserver) {
+            this.scrollObserver.disconnect();
+          }
+
+          this.scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          }, {
+            root: null,
+            threshold: 0.08,
+            rootMargin: '0px 0px -30px 0px'
+          });
+
+          elements.forEach(el => {
+            if (el.classList.contains('is-visible')) return;
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight - 30 && rect.bottom >= 0) {
+              el.classList.add('is-visible');
+            } else {
+              this.scrollObserver.observe(el);
+            }
+          });
+        } else {
+          elements.forEach(el => el.classList.add('is-visible'));
+        }
+      }, 60);
+    }
+
     render() {
       this.renderHeader();
       this.renderFloatingWhatsApp();
@@ -852,6 +890,7 @@
         this.renderStorefront();
       }
       this.renderFooter();
+      this.initScrollObserver();
     }
 
     renderFloatingWhatsApp() {
@@ -1029,14 +1068,14 @@
     renderContactPage() {
       const container = document.getElementById('appContent');
       container.innerHTML = `
-        <div class="contact-hero">
+        <div class="contact-hero reveal-on-scroll" data-animate="fade-up">
           <h1>Contact <span>Auto Homage</span></h1>
           <p>We're here to help you find the right product for your vehicle. Call, WhatsApp, email, or connect with us on social media.</p>
         </div>
 
         <div class="contact-grid">
           <!-- Contact Info Column -->
-          <div class="contact-info-card">
+          <div class="contact-info-card reveal-on-scroll" data-animate="slide-right" data-delay="100">
             <h3 style="margin-bottom: 1.5rem; color: var(--text-main);">Get In Touch</h3>
 
             <div class="contact-info-item">
@@ -1122,7 +1161,7 @@
           </div>
 
           <!-- Enquiry Form -->
-          <div class="contact-form-card">
+          <div class="contact-form-card reveal-on-scroll" data-animate="slide-left" data-delay="200">
             <h3 style="margin-bottom: 0.5rem;">Send Us an Enquiry</h3>
             <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">We respond within 2 business hours during working days.</p>
 
@@ -1182,19 +1221,19 @@
 
       container.innerHTML = `
         <!-- HIGH IMPACT SUPERCAR HERO SHOWCASE BANNER -->
-        <section class="warm-luxury-hero" style="background: linear-gradient(90deg, rgba(12,10,9,0.95) 0%, rgba(28,25,23,0.85) 45%, rgba(12,10,9,0.35) 100%), url('${HERO_SUPERCAR_IMG}') right center/cover no-repeat; min-height: 520px; border-radius: 20px; padding: 3.5rem 3rem; display: flex; align-items: center; margin-bottom: 2rem; position: relative;">
+        <section class="warm-luxury-hero reveal-on-scroll" data-animate="fade-up" style="background: linear-gradient(90deg, rgba(12,10,9,0.95) 0%, rgba(28,25,23,0.85) 45%, rgba(12,10,9,0.35) 100%), url('${HERO_SUPERCAR_IMG}') right center/cover no-repeat; min-height: 520px; border-radius: 20px; padding: 3.5rem 3rem; display: flex; align-items: center; margin-bottom: 2rem; position: relative;">
           <div style="max-width: 580px; position: relative; z-index: 2;">
-            <div class="hero-luxury-kicker" style="background: rgba(198,146,20,0.18); border: 1px solid rgba(198,146,20,0.5); color: #fef08a; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.5rem; text-transform: uppercase; margin-bottom: 1.2rem;">
+            <div class="hero-luxury-kicker reveal-on-scroll" data-animate="fade-up" data-delay="100" style="background: rgba(198,146,20,0.18); border: 1px solid rgba(198,146,20,0.5); color: #fef08a; padding: 0.4rem 1rem; border-radius: 9999px; font-size: 0.78rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.5rem; text-transform: uppercase; margin-bottom: 1.2rem;">
               ${ICONS.shield} CERTIFIED GENUINE AUTOMOTIVE CARE & SPARES • AUTHORIZED DISTRIBUTOR
             </div>
-            <h1 class="hero-luxury-title" style="font-size: 3.2rem; font-weight: 800; line-height: 1.08; margin-bottom: 1.2rem; color: #ffffff;">
+            <h1 class="hero-luxury-title reveal-on-scroll" data-animate="fade-up" data-delay="150" style="font-size: 3.2rem; font-weight: 800; line-height: 1.08; margin-bottom: 1.2rem; color: #ffffff;">
               QUALITY PARTS.<br><span style="color: var(--primary-gold); background: linear-gradient(135deg, #fef08a, #c69214); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">PREMIUM CARE.</span>
             </h1>
-            <p class="hero-luxury-desc" style="color: #d6d3d1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+            <p class="hero-luxury-desc reveal-on-scroll" data-animate="fade-up" data-delay="200" style="color: #d6d3d1; font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
               Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages &amp; wholesale dealers across Kenya.
             </p>
 
-            <div class="hero-cta-group" style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <div class="hero-cta-group reveal-on-scroll" data-animate="fade-up" data-delay="250" style="display: flex; gap: 1rem; flex-wrap: wrap;">
               <button class="btn-gold-action" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})" style="padding: 0.9rem 1.8rem; font-size: 1rem;">
                 SHOP NOW →
               </button>
@@ -1206,8 +1245,8 @@
         </section>
 
         <!-- DARK TRUST PILLARS BAR MATCHING REFERENCE IMAGE -->
-        <div style="background: #0c0a09; border: 1px solid rgba(198,146,20,0.25); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; color: #ffffff;">
-          <div style="display: flex; align-items: center; gap: 1rem;">
+        <div class="reveal-on-scroll" data-animate="fade-up" data-delay="150" style="background: #0c0a09; border: 1px solid rgba(198,146,20,0.25); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; color: #ffffff;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="100" style="display: flex; align-items: center; gap: 1rem;">
             <div class="trust-pill-icon">🛡️</div>
             <div>
               <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">AUTHENTIC &amp; CERTIFIED</div>
@@ -1215,7 +1254,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="150" style="display: flex; align-items: center; gap: 1rem;">
             <div class="trust-pill-icon">🎖️</div>
             <div>
               <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">PREMIUM QUALITY</div>
@@ -1223,7 +1262,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="200" style="display: flex; align-items: center; gap: 1rem;">
             <div class="trust-pill-icon">🚚</div>
             <div>
               <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">FAST &amp; RELIABLE</div>
@@ -1231,7 +1270,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 1rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="250" style="display: flex; align-items: center; gap: 1rem;">
             <div class="trust-pill-icon">🎧</div>
             <div>
               <div style="font-weight: 800; font-size: 0.88rem; color: #ffffff; text-transform: uppercase;">EXPERT SUPPORT</div>
@@ -1242,7 +1281,7 @@
 
         <!-- SHOP BY CATEGORY SHOWCASE GRID MATCHING REFERENCE IMAGE -->
         <section id="categorySection" style="margin-bottom: 4rem;">
-          <div style="text-align: center; margin-bottom: 2.5rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" style="text-align: center; margin-bottom: 2.5rem;">
             <h2 style="font-family: var(--font-heading); font-size: 2.2rem; font-weight: 800; text-transform: uppercase; letter-spacing: -0.01em;">
               SHOP BY <span style="color: var(--primary-gold);">CATEGORY</span>
             </h2>
@@ -1251,7 +1290,7 @@
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
             <!-- Card 1 -->
-            <div class="category-showcase-card" data-action="set-category" data-id="exterior_detailing" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <div class="category-showcase-card reveal-on-scroll" data-animate="zoom-in" data-delay="100" data-action="set-category" data-id="exterior_detailing" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
               <div>
                 <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
                   <img src="Products/Gradiator Products/Multi-Purpose Degreaser.jpg" alt="Car Care & Detailing" style="max-height: 100%; object-fit: contain;">
@@ -1265,7 +1304,7 @@
             </div>
 
             <!-- Card 2 -->
-            <div class="category-showcase-card" data-action="set-category" data-id="service_maintenance" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <div class="category-showcase-card reveal-on-scroll" data-animate="zoom-in" data-delay="150" data-action="set-category" data-id="service_maintenance" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
               <div>
                 <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
                   <img src="Products/Spark Plug.jpg" alt="Engine Parts" style="max-height: 100%; object-fit: contain;">
@@ -1279,7 +1318,7 @@
             </div>
 
             <!-- Card 3 -->
-            <div class="category-showcase-card" data-action="set-category" data-id="interior_accessories" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <div class="category-showcase-card reveal-on-scroll" data-animate="zoom-in" data-delay="200" data-action="set-category" data-id="interior_accessories" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
               <div>
                 <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
                   <img src="Products/Mats/Fancy Car Mat.jpg" alt="3D Mats & Interiors" style="max-height: 100%; object-fit: contain;">
@@ -1293,7 +1332,7 @@
             </div>
 
             <!-- Card 4 -->
-            <div class="category-showcase-card" data-action="set-category" data-id="tires_wheels" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <div class="category-showcase-card reveal-on-scroll" data-animate="zoom-in" data-delay="250" data-action="set-category" data-id="tires_wheels" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
               <div>
                 <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
                   <img src="Products/Wiper Blade.jpg" alt="Exterior Accessories" style="max-height: 100%; object-fit: contain;">
@@ -1307,7 +1346,7 @@
             </div>
 
             <!-- Card 5 -->
-            <div class="category-showcase-card" data-action="set-category" data-id="tools_safety" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
+            <div class="category-showcase-card reveal-on-scroll" data-animate="zoom-in" data-delay="300" data-action="set-category" data-id="tools_safety" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);">
               <div>
                 <div style="height: 140px; display: flex; align-items: center; justify-content: center; margin-bottom: 1.2rem;">
                   <img src="Products/Radiator Coolant.jpg" alt="Electrical & Lighting" style="max-height: 100%; object-fit: contain;">
@@ -1323,8 +1362,8 @@
         </section>
 
         <!-- EXCLUSIVE BRANDS. TRUSTED QUALITY. DARK SECTION MATCHING REFERENCE IMAGE -->
-        <section style="background: #0c0a09; border-radius: 20px; padding: 3rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; align-items: center;">
-          <div>
+        <section class="reveal-on-scroll" data-animate="fade-up" style="background: #0c0a09; border-radius: 20px; padding: 3rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: grid; grid-template-columns: 1fr 1.6fr; gap: 2.5rem; align-items: center;">
+          <div class="reveal-on-scroll" data-animate="slide-right" data-delay="100">
             <h2 style="font-family: var(--font-heading); font-size: 2.1rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; color: #ffffff; text-transform: uppercase;">
               EXCLUSIVE BRANDS.<br><span style="color: var(--primary-gold);">TRUSTED QUALITY.</span>
             </h2>
@@ -1337,15 +1376,15 @@
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-            <div class="brand-logo-dark-card" data-action="set-brand" data-id="gladiator">
+            <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="150" data-action="set-brand" data-id="gladiator">
               <span style="font-weight: 800; font-size: 1.05rem; color: #ffffff;">GLADIATOR</span>
               <span style="font-size: 0.68rem; color: var(--primary-gold); text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">CAR TECH</span>
             </div>
-            <div class="brand-logo-dark-card" data-action="set-brand" data-id="flamingo">
+            <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="200" data-action="set-brand" data-id="flamingo">
               <span style="font-weight: 800; font-size: 1.05rem; color: #ff6b81;">FLAMINGO</span>
               <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">FORMULAS</span>
             </div>
-            <div class="brand-logo-dark-card" data-action="set-brand" data-id="power_eagle">
+            <div class="brand-logo-dark-card reveal-on-scroll" data-animate="zoom-in" data-delay="250" data-action="set-brand" data-id="power_eagle">
               <span style="font-weight: 800; font-size: 1.05rem; color: #f59e0b;">POWER EAGLE</span>
               <span style="font-size: 0.68rem; color: #a8a29e; text-transform: uppercase; font-weight: 700; margin-top: 0.2rem;">SERIES</span>
             </div>
@@ -1353,8 +1392,8 @@
         </section>
 
         <!-- BOTTOM LIGHT FEATURE STRIP MATCHING REFERENCE IMAGE -->
-        <div style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; box-shadow: var(--shadow-sm);">
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
+        <div class="reveal-on-scroll" data-animate="fade-up" data-delay="100" style="background: #ffffff; border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.4rem 2rem; margin-bottom: 3.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; box-shadow: var(--shadow-sm);">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="100" style="display: flex; align-items: center; gap: 0.9rem;">
             <div style="font-size: 1.8rem;">🚚</div>
             <div>
               <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">FREE DELIVERY</div>
@@ -1362,7 +1401,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="150" style="display: flex; align-items: center; gap: 0.9rem;">
             <div style="font-size: 1.8rem;">🛡️</div>
             <div>
               <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">SECURE PAYMENTS</div>
@@ -1370,7 +1409,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="200" style="display: flex; align-items: center; gap: 0.9rem;">
             <div style="font-size: 1.8rem;">🎖️</div>
             <div>
               <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">EASY RETURNS</div>
@@ -1378,7 +1417,7 @@
             </div>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 0.9rem;">
+          <div class="reveal-on-scroll" data-animate="fade-up" data-delay="250" style="display: flex; align-items: center; gap: 0.9rem;">
             <div style="font-size: 1.8rem;">🎧</div>
             <div>
               <div style="font-weight: 800; font-size: 0.85rem; text-transform: uppercase; color: var(--text-main);">NEED HELP?</div>
@@ -1388,7 +1427,7 @@
         </div>
 
         <!-- WHOLESALE & GARAGE PARTNERS BANNER MATCHING REFERENCE IMAGE -->
-        <section style="background: #0c0a09; border: 1.5px solid var(--border-gold); border-radius: 16px; padding: 1.8rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <section class="reveal-on-scroll" data-animate="fade-up" data-delay="100" style="background: #0c0a09; border: 1.5px solid var(--border-gold); border-radius: 16px; padding: 1.8rem 2.5rem; margin-bottom: 3.5rem; color: #ffffff; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
           <div style="display: flex; align-items: center; gap: 1.2rem;">
             <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(198,146,20,0.2); border: 1px solid var(--primary-gold); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
               🏎️
@@ -1405,7 +1444,7 @@
         </section>
 
         <!-- Vehicle Finder Card Widget -->
-        <div class="warm-finder-card">
+        <div class="warm-finder-card reveal-on-scroll" data-animate="fade-up" data-delay="100">
           <div class="finder-card-header">
             <div style="display: flex; align-items: center; gap: 0.8rem;">
               <div style="width: 42px; height: 42px; background: var(--primary-gold-light); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary-gold-dark);">
@@ -1460,32 +1499,32 @@
         </div>
 
         <!-- Featured Brand Collections -->
-        <section class="featured-brands-section">
+        <section class="featured-brands-section reveal-on-scroll" data-animate="fade-up">
           <div class="section-heading-block">
             <h2 class="section-title">Authorized Brand Collections</h2>
             <p class="section-subtitle">Browse through our curated lines of high-performance car care formulas and accessories</p>
           </div>
 
           <div class="brand-showcase-grid">
-            <div class="brand-feature-card" data-action="set-brand" data-id="gladiator" style="cursor: pointer;">
+            <div class="brand-feature-card reveal-on-scroll" data-animate="zoom-in" data-delay="100" data-action="set-brand" data-id="gladiator" style="cursor: pointer;">
               <div class="brand-card-icon">🏎️</div>
               <h3>Gladiator Car Tech</h3>
               <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem;">High-shine tire foams, hard wax compounds, degreasers & 12V air compressors.</p>
             </div>
 
-            <div class="brand-feature-card" data-action="set-brand" data-id="flamingo" style="cursor: pointer;">
+            <div class="brand-feature-card reveal-on-scroll" data-animate="zoom-in" data-delay="150" data-action="set-brand" data-id="flamingo" style="cursor: pointer;">
               <div class="brand-card-icon">✨</div>
               <h3>Flamingo Formulations</h3>
               <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem;">Nano ceramic coating wax, AC Pro deodorizers, and dashboard polishes.</p>
             </div>
 
-            <div class="brand-feature-card" data-action="set-brand" data-id="power_eagle" style="cursor: pointer;">
+            <div class="brand-feature-card reveal-on-scroll" data-animate="zoom-in" data-delay="200" data-action="set-brand" data-id="power_eagle" style="cursor: pointer;">
               <div class="brand-card-icon">⚡</div>
               <h3>Power Eagle Series</h3>
               <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem;">Engine degreasers, throttle system cleaners & high-heat lubricants.</p>
             </div>
 
-            <div class="brand-feature-card" data-action="set-brand" data-id="universal" style="cursor: pointer;">
+            <div class="brand-feature-card reveal-on-scroll" data-animate="zoom-in" data-delay="250" data-action="set-brand" data-id="universal" style="cursor: pointer;">
               <div class="brand-card-icon">🚗</div>
               <h3>Custom Fit Mats & Tools</h3>
               <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 0.4rem;">Tailored 3D floor mats for Toyota, Subaru, Mercedes, plus emergency gear.</p>
@@ -1495,7 +1534,7 @@
 
         <!-- Main Catalog Section -->
         <div id="catalogSection">
-          <div class="catalog-filter-bar">
+          <div class="catalog-filter-bar reveal-on-scroll" data-animate="fade-up">
             <div class="bar-row-upper">
               <!-- Brand Filter Tabs -->
               <div style="display: flex; gap: 0.4rem; overflow-x: auto;">
@@ -1612,9 +1651,10 @@
         const unitLabel = this.priceMode === 'carton' ? `Wholesale Carton (${p.pcsPerCtn} pcs)` : 'Single Unit Rate';
         // First 8 images load eagerly; rest are lazy-loaded for performance
         const loadStrategy = idx < 8 ? 'eager' : 'lazy';
+        const delay = (idx % 6) * 50 + 50;
 
         return `
-          <div class="luxury-product-card">
+          <div class="luxury-product-card reveal-on-scroll" data-animate="fade-up" data-delay="${delay}">
             <div class="product-image-container" data-action="view-product" data-id="${p.id}">
               <img src="${p.image}" alt="${p.name}" class="product-hero-image" loading="${loadStrategy}" decoding="async" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
               <div class="badge-tag-stack">
@@ -1652,6 +1692,8 @@
           </div>
         `;
       }).join('');
+
+      this.initScrollObserver();
 
       // Render pagination controls if more than one page
       if (totalPages > 1) {
