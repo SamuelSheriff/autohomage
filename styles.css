@@ -1069,11 +1069,14 @@ header {
   transition: var(--transition);
   flex-shrink: 0;
   font-family: inherit;
+  white-space: nowrap;
 }
 .btn-add-cart:hover {
   background: var(--primary-gold);
   box-shadow: var(--shadow-gold);
 }
+.btn-add-cart .btn-cart-icon { display: inline-flex; flex-shrink: 0; }
+.btn-add-cart .btn-cart-label { display: inline; }
 
 /* ===================== MODALS ===================== */
 .modal-gold-overlay {
@@ -1635,14 +1638,29 @@ header {
   .top-hotline-bar { padding: 0.4rem 1rem; font-size: 0.76rem; }
   .top-hotline-bar > div:last-child { display: none; }
 
-  .main-header { padding: 0.7rem 1rem; gap: 0.8rem; }
-  .official-logo-img { height: 42px; }
-  .brand-title { font-size: 1.25rem; }
+  /* Header: icon-only compact layout */
+  .main-header {
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+    grid-template-columns: auto 1fr auto;
+  }
+  .official-logo-img { height: 40px; }
+  .brand-title { font-size: 1.15rem; }
   .brand-slogan { display: none; }
 
-  .header-action-group { gap: 0.6rem; }
+  /* Action group: compact, icon-only on mobile */
+  .header-action-group { gap: 0.45rem; }
+  .call-hotline-btn { padding: 0.5rem; }
   .call-hotline-btn span { display: none; }
+  /* Hide admin portal button entirely on mobile unless authenticated admin is viewing */
+  .admin-portal-btn { display: none; }
+  .admin-portal-btn.admin-visible-mobile { display: flex; }
   .admin-portal-btn span { display: none; }
+  .cart-drawer-trigger { padding: 0.5rem 0.75rem; }
+  .cart-drawer-trigger span:first-of-type { display: none; }
+
+  /* Desktop center nav is hidden — hamburger shows instead */
+  .center-nav-links { display: none !important; }
 
   .landing-page-container { padding: 1rem; }
 
@@ -1652,9 +1670,6 @@ header {
     min-height: unset;
   }
   .hero-logo-display { display: none; }
-  .hero-luxury-title { font-size: 2rem; }
-  .hero-luxury-desc { font-size: 0.95rem; }
-  .hero-cta-group { flex-direction: column; align-items: stretch; }
 
   .finder-grid { grid-template-columns: 1fr 1fr; }
   .finder-grid > button { grid-column: 1 / -1; }
@@ -1666,10 +1681,37 @@ header {
   .bar-row-upper { flex-direction: column; align-items: stretch; }
   .price-mode-switch { justify-content: center; }
 
-  .products-display-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
+  /* Product grid: 2-column layout on tablets */
+  .products-display-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
   .product-image-container { height: 160px; }
-  .product-info-body { padding: 0.9rem; }
-  .product-price-amount { font-size: 1.1rem; }
+  .product-info-body { padding: 0.85rem; }
+  .product-price-amount { font-size: 1.05rem; }
+  .product-title-text { font-size: 0.9rem; min-height: unset; }
+
+  /* Product card action row: stack price and buttons vertically */
+  .product-price-action-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+  .product-price-action-row > div:last-child {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .btn-whatsapp-direct {
+    flex: 1;
+    justify-content: center;
+    padding: 0.6rem;
+    text-align: center;
+  }
+  .btn-add-cart {
+    flex: 2;
+    justify-content: center;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.82rem;
+  }
+  .btn-add-cart .btn-cart-label { display: inline; }
 
   .modal-gold-overlay { padding: 0.5rem; align-items: flex-end; }
   .modal-gold-box { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 95vh; }
@@ -1677,20 +1719,36 @@ header {
   .warm-cart-drawer { max-width: 100%; }
 
   .footer-main { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem 1rem; }
-  .footer-bottom { padding: 1rem; }
+  .footer-bottom { padding: 1rem; flex-direction: column; text-align: center; }
 
   .floating-whatsapp-btn { bottom: 1.2rem; right: 1.2rem; width: 52px; height: 52px; }
 
   .corporate-stat-card { padding: 1.2rem; }
+
+  /* Contact page: single column */
+  .contact-grid { grid-template-columns: 1fr; }
+  .contact-hero { padding: 2rem 1.5rem; }
 }
 
 @media (max-width: 480px) {
   .brand-showcase-grid { grid-template-columns: 1fr; }
   .finder-grid { grid-template-columns: 1fr; }
-  .products-display-grid { grid-template-columns: 1fr 1fr; gap: 0.8rem; }
-  .product-image-container { height: 140px; padding: 0.8rem; }
-  .product-title-text { font-size: 0.88rem; }
-  .btn-add-cart span { display: none; }
+
+  /* Product grid: still 2 columns but more compact */
+  .products-display-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .product-image-container { height: 130px; padding: 0.7rem; }
+  .product-info-body { padding: 0.7rem; }
+  .product-title-text { font-size: 0.82rem; -webkit-line-clamp: 2; }
+  .sku-code-label { display: none; }
+  .product-price-amount { font-size: 1rem; }
+  /* Star ratings: hide review count on tiny screens */
+  .product-info-body > div[style*="amber"] span:last-child { display: none; }
+  /* Hide Pay on Delivery badge on tiny screens */
+  .badge-pay-delivery { display: none; }
+
+  /* Cart icon always visible; hide text label only */
+  .btn-add-cart .btn-cart-label { display: none; }
+  .btn-add-cart { padding: 0.55rem 0.7rem; }
 
   /* Admin Dashboard Mobile Table Touch Scroll & Responsive Layout */
   #adminInventoryTableContainer,
@@ -1699,7 +1757,6 @@ header {
     -webkit-overflow-scrolling: touch;
     border-radius: var(--radius-md);
   }
-
   .admin-table-input {
     font-size: 0.85rem !important;
     padding: 0.4rem 0.5rem !important;
