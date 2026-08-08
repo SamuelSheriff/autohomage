@@ -1892,7 +1892,7 @@
           <div class="catalog-filter-bar reveal-on-scroll" data-animate="fade-up">
             <div class="bar-row-upper">
               <!-- Brand Filter Tabs -->
-              <div style="display: flex; gap: 0.4rem; overflow-x: auto;">
+              <div class="brand-tabs-container" style="display: flex; gap: 0.4rem; overflow-x: auto;">
                 ${BRAND_LIST.map(b => `
                   <button class="brand-tab-btn ${this.activeBrand === b.id ? 'active' : ''}" data-action="set-brand" data-id="${b.id}">
                     ${b.name}
@@ -1918,7 +1918,7 @@
             </div>
 
             <!-- Category Pills -->
-            <div style="display: flex; gap: 0.5rem; overflow-x: auto; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
+            <div class="category-pills-container" style="display: flex; gap: 0.5rem; overflow-x: auto; padding-top: 0.8rem; border-top: 1px solid var(--border-subtle);">
               ${CATEGORIES.map(c => `
                 <button class="cat-pill ${this.activeCategory === c.id ? 'active' : ''}" data-action="set-category" data-id="${c.id}">
                   ${c.name}
