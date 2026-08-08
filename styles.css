@@ -1700,12 +1700,24 @@ header {
 
   .corporate-stat-card { padding: 1.2rem; }
 
-  /* Fix 3: Exclusive Brands dark section — collapse to single column on mobile */
+  /* Fix 3: Exclusive Brands dark section — collapse to single column & responsive padding */
   .exclusive-brands-section-grid {
     grid-template-columns: 1fr !important;
+    padding: 1.8rem 1.2rem !important;
+    gap: 1.8rem !important;
+  }
+  .exclusive-brands-section-grid h2 {
+    font-size: 1.6rem !important;
   }
   .exclusive-brands-sub-grid {
-    grid-template-columns: repeat(3, 1fr) !important;
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+  }
+  .brand-logo-dark-card {
+    padding: 1rem 0.8rem !important;
+  }
+  .brand-logo-dark-card span {
+    font-size: 0.92rem !important;
   }
 
   /* Fix 4: Wholesale Banner — stack vertically on mobile */
