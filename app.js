@@ -357,6 +357,18 @@
             this.renderCartDrawer();
             break;
 
+          case 'open-checkout':
+            this.isCartOpen = false;
+            this.isCheckoutOpen = true;
+            this.renderCartDrawer();   // removes cart drawer from DOM
+            this.renderCheckoutModal(); // shows checkout on top
+            break;
+
+          case 'close-checkout':
+            this.isCheckoutOpen = false;
+            this.renderCheckoutModal();
+            break;
+
           case 'set-brand':
             this.activeBrand = id;
             this.activePage = 'shop';
@@ -401,16 +413,7 @@
             this.updateCartQty(parseInt(id), parseInt(target.dataset.change));
             break;
 
-          case 'open-checkout':
-            this.isCartOpen = false;
-            this.isCheckoutOpen = true;
-            this.renderCheckoutModal();
-            break;
 
-          case 'close-checkout':
-            this.isCheckoutOpen = false;
-            this.renderCheckoutModal();
-            break;
 
           case 'view-order-receipt':
             this.viewingOrder = this.orders.find(o => o.id === id);
@@ -768,9 +771,27 @@
       }
 
       this.saveCart();
-      this.showToast(`Added to Cart: ${product.name.substring(0, 36)}...`);
-      this.isCartOpen = true;
-      this.renderCartDrawer();
+      this.updateCartBadge();
+
+      // Show toast — never auto-open the cart
+      this.showToast(`✅ Added: ${product.name.substring(0, 28)}`, '🛒 View Cart', () => {
+        this.isCartOpen = true;
+        this.renderCartDrawer();
+      });
+
+      // If cart drawer is already open, refresh it in place
+      if (this.isCartOpen) {
+        this.renderCartDrawer();
+      }
+    }
+
+    updateCartBadge() {
+      const badge = document.getElementById('cartBadge');
+      if (badge) {
+        const total = this.cart.reduce((t, i) => t + i.qty, 0);
+        badge.textContent = total;
+        badge.style.display = total > 0 ? 'flex' : 'none';
+      }
     }
 
     removeFromCart(index) {
@@ -812,26 +833,74 @@
       const tax = Math.round(subtotal * 0.16);
       const total = subtotal + tax;
 
+      const customerName = formData.get('customerName') || 'Valued Customer';
+      const customerPhone = formData.get('customerPhone') || '';
+      const customerEmail = formData.get('customerEmail') || '';
+      const customerCity = formData.get('customerCity') || 'Nairobi';
+      const customerAddress = formData.get('customerAddress') || 'Delivery Address';
+      const paymentMethod = formData.get('paymentMethod') || 'Cash on Delivery';
+
       const newOrder = {
         id: 'ORD-2026-' + Math.floor(1000 + Math.random() * 9000),
         customer: {
-          name: formData.get('customerName'),
-          email: formData.get('customerEmail'),
-          phone: formData.get('customerPhone'),
-          city: formData.get('customerCity'),
-          address: formData.get('customerAddress')
+          name: customerName,
+          email: customerEmail,
+          phone: customerPhone,
+          city: customerCity,
+          address: customerAddress
         },
         vehicle: this.activeVehicle.make 
           ? `${this.activeVehicle.make} ${this.activeVehicle.model} (${this.activeVehicle.year})`
           : 'Universal Order',
         items: [...this.cart],
         totalAmount: total,
-        paymentMethod: formData.get('paymentMethod'),
-        paymentStatus: formData.get('paymentMethod') === 'Cash on Delivery' ? 'Pending' : 'Paid',
+        paymentMethod: paymentMethod,
+        paymentStatus: paymentMethod === 'Cash on Delivery' ? 'Pending' : 'Paid',
         status: 'Pending',
         date: new Date().toISOString().replace('T', ' ').substring(0, 16)
       };
 
+      // Format WhatsApp order message for store owner
+      const itemLines = newOrder.items.map((item, idx) => {
+        const rateType = item.priceMode === 'carton' ? `Wholesale Carton (${item.pcsPerCtn} pcs)` : 'Single Unit';
+        return `${idx + 1}. *${item.name}* (Code: ${item.code})\n   Qty: ${item.qty} x KSh ${item.price.toLocaleString()} (${rateType}) = KSh ${(item.price * item.qty).toLocaleString()}`;
+      }).join('\n');
+
+      const waMsg = 
+`🛍️ *NEW ORDER RECEIVED - AUTO HOMAGE*
+
+📋 *Order Ref:* ${newOrder.id}
+📅 *Date:* ${newOrder.date}
+
+👤 *CUSTOMER DETAILS:*
+• Name: ${newOrder.customer.name}
+• Phone: ${newOrder.customer.phone}
+• Email: ${newOrder.customer.email || 'N/A'}
+• Location: ${newOrder.customer.address}, ${newOrder.customer.city}
+• Vehicle: ${newOrder.vehicle}
+
+💳 *PAYMENT METHOD:*
+• ${newOrder.paymentMethod} (${newOrder.paymentStatus})
+
+🛒 *ORDER ITEMS:*
+${itemLines}
+
+📊 *SUMMARY:*
+• Subtotal: KSh ${subtotal.toLocaleString()}
+• VAT (16%): KSh ${tax.toLocaleString()}
+💰 *TOTAL AMOUNT:* KSh ${newOrder.totalAmount.toLocaleString()}
+
+Please confirm delivery schedule for this order. Thank you!`;
+
+      const targetPhone = '254' + HOTLINE_PHONE.replace(/^0/, '');
+      const waUrl = `https://wa.me/${targetPhone}?text=${encodeURIComponent(waMsg)}`;
+      newOrder.waUrl = waUrl;
+
+      // ⚠️ IMPORTANT: Open WhatsApp NOW — before any await calls.
+      // iOS Safari blocks window.open() if called after an await (loses user gesture context).
+      window.open(waUrl, '_blank');
+
+      // Now do async DB work (after WhatsApp is already opened)
       if (this.supabaseClient) {
         try {
           await this.supabaseClient.from('orders').insert([{
@@ -850,7 +919,7 @@
             date: newOrder.date
           }]);
         } catch (err) {
-          // Supabase insert error
+          // Supabase insert error — non-critical
         }
       }
 
@@ -861,18 +930,27 @@
           body: JSON.stringify(newOrder)
         });
       } catch (err) {
-        // Fallback
+        // Fallback — non-critical
       }
 
+      // Update local state
       this.orders.unshift(newOrder);
       this.saveOrders();
       
       this.cart = [];
       this.saveCart();
+      this.updateCartBadge();
 
       this.isCheckoutOpen = false;
       this.viewingOrder = newOrder;
-      this.render();
+
+      // Targeted renders only — do NOT call this.render() as it rebuilds the whole page
+      this.renderCheckoutModal();  // closes checkout modal (isCheckoutOpen = false)
+      this.renderReceiptModal();   // opens receipt modal (viewingOrder is set)
+
+      this.showToast('✅ Order sent to WhatsApp!', '💬 Resend', () => {
+        window.open(waUrl, '_blank');
+      });
     }
 
     async handleOrderStatusUpdate(orderId, newStatus) {
@@ -907,15 +985,30 @@
       }
     }
 
-    showToast(message) {
+    showToast(message, actionText, actionCallback) {
       const existing = document.getElementById('toastNotif');
       if (existing) existing.remove();
       const toast = document.createElement('div');
       toast.id = 'toastNotif';
       toast.className = 'toast-notification';
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 3500);
+
+      if (actionText && typeof actionCallback === 'function') {
+        toast.innerHTML = `
+          <span>${message}</span>
+          <button class="toast-action-btn" id="toastActionBtn">${actionText}</button>
+        `;
+        document.body.appendChild(toast);
+        document.getElementById('toastActionBtn')?.addEventListener('click', (e) => {
+          e.stopPropagation();
+          actionCallback();
+          toast.remove();
+        });
+      } else {
+        toast.textContent = message;
+        document.body.appendChild(toast);
+      }
+
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
     }
 
     initScrollObserver() {
@@ -973,6 +1066,12 @@
       }
       this.renderFooter();
       this.initScrollObserver();
+
+      // Render Active Drawer & Overlay Modals
+      this.renderCartDrawer();
+      this.renderCheckoutModal();
+      this.renderReceiptModal();
+      this.renderProductModal();
     }
 
     renderFloatingWhatsApp() {
@@ -2181,72 +2280,73 @@
     }
 
     renderCartDrawer() {
-      let drawer = document.getElementById('cartDrawerContainer');
+      let container = document.getElementById('cartDrawerContainer');
       if (!this.isCartOpen) {
-        if (drawer) drawer.remove();
+        if (container) container.remove();
         return;
       }
 
-      if (!drawer) {
-        drawer = document.createElement('div');
-        drawer.id = 'cartDrawerContainer';
-        document.body.appendChild(drawer);
+      if (!container) {
+        container = document.createElement('div');
+        container.id = 'cartDrawerContainer';
+        document.body.appendChild(container);
       }
 
       const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
       const tax = Math.round(subtotal * 0.16);
       const total = subtotal + tax;
 
-      drawer.innerHTML = `
-        <div class="warm-cart-drawer">
-          <div style="padding: 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between;">
-            <h3>Your Order Cart (${this.cart.reduce((t, i) => t + i.qty, 0)})</h3>
-            <button class="close-btn-round" style="position: static;" data-action="close-cart">✕</button>
+      container.innerHTML = `
+        <!-- Backdrop: clicking it closes the cart -->
+        <div class="cart-drawer-backdrop" data-action="close-cart"></div>
+
+        <!-- Cart Panel -->
+        <div class="warm-cart-drawer" role="dialog" aria-label="Shopping Cart">
+          <div style="padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border-subtle); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;">
+            <h3 style="margin:0; font-size: 1.1rem;">Your Cart (${this.cart.reduce((t, i) => t + i.qty, 0)} items)</h3>
+            <button class="close-btn-round" style="position: static; flex-shrink:0;" data-action="close-cart" aria-label="Close cart">&times;</button>
           </div>
 
-          <div style="flex: 1; overflow-y: auto; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem;">
+          <div style="flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 1rem; display: flex; flex-direction: column; gap: 1rem;">
             ${this.cart.length === 0 ? `
               <div style="text-align: center; padding: 4rem 1rem; color: var(--text-muted);">
-                <div style="margin-bottom: 1rem;">${ICONS.cart}</div>
-                <p>Your shopping cart is empty</p>
+                <div style="margin-bottom: 1rem; font-size: 2.5rem;">🛒</div>
+                <p>Your cart is empty</p>
               </div>
             ` : this.cart.map((item, idx) => `
-              <div style="display: flex; gap: 1rem; background: var(--bg-warm-gold); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 0.9rem; align-items: center;">
-                <img src="${item.image}" alt="${item.name}" style="width: 55px; height: 55px; object-fit: contain; background: #fff; border-radius: 6px; border: 1px solid var(--border-subtle);" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
-                <div style="flex: 1;">
-                  <div style="font-weight: 800; font-size: 0.88rem; line-height: 1.3;">${item.name}</div>
-                  <div style="font-size: 0.75rem; color: var(--text-muted);">${item.priceMode === 'carton' ? `Carton Bulk (${item.pcsPerCtn} pcs)` : 'Single Unit'}</div>
-                  <div style="font-weight: 800; color: var(--bg-dark-obsidian); margin-top: 0.2rem;">KSh ${(item.price * item.qty).toLocaleString()}</div>
+              <div style="display: flex; gap: 0.8rem; background: var(--bg-warm-gold); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: 0.8rem; align-items: center;">
+                <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: contain; background: #fff; border-radius: 6px; border: 1px solid var(--border-subtle); flex-shrink: 0;" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-weight: 800; font-size: 0.85rem; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</div>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">${item.priceMode === 'carton' ? `Carton (${item.pcsPerCtn} pcs)` : 'Single Unit'}</div>
+                  <div style="font-weight: 800; color: var(--bg-dark-obsidian); font-size: 0.9rem;">KSh ${(item.price * item.qty).toLocaleString()}</div>
                 </div>
 
-                <div style="display: flex; align-items: center; gap: 0.4rem; background: #fff; border: 1px solid var(--border-strong); border-radius: 6px; padding: 0.15rem;">
-                  <button style="width: 22px; height: 22px; border: none; background: none; font-weight: bold; cursor: pointer;" data-action="update-qty" data-id="${idx}" data-change="-1">-</button>
-                  <span style="font-size: 0.85rem; font-weight: 800; width: 18px; text-align: center;">${item.qty}</span>
-                  <button style="width: 22px; height: 22px; border: none; background: none; font-weight: bold; cursor: pointer;" data-action="update-qty" data-id="${idx}" data-change="1">+</button>
+                <div style="display: flex; align-items: center; gap: 0.3rem; background: #fff; border: 1px solid var(--border-strong); border-radius: 6px; padding: 0.2rem; flex-shrink: 0;">
+                  <button style="width: 26px; height: 26px; border: none; background: none; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 4px;" data-action="update-qty" data-id="${idx}" data-change="-1">−</button>
+                  <span style="font-size: 0.9rem; font-weight: 800; width: 20px; text-align: center;">${item.qty}</span>
+                  <button style="width: 26px; height: 26px; border: none; background: none; font-size: 1rem; font-weight: bold; cursor: pointer; border-radius: 4px;" data-action="update-qty" data-id="${idx}" data-change="1">+</button>
                 </div>
 
-                <button style="color: var(--accent-deep-red); background: none; border: none; font-weight: bold; cursor: pointer; padding: 0.4rem;" data-action="remove-cart-item" data-id="${idx}">✕</button>
+                <button style="color: var(--accent-deep-red); background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0.4rem; flex-shrink: 0;" data-action="remove-cart-item" data-id="${idx}" aria-label="Remove item">&times;</button>
               </div>
             `).join('')}
           </div>
 
           ${this.cart.length > 0 ? `
-            <div style="padding: 1.5rem; border-top: 1px solid var(--border-subtle); background: var(--bg-subtle);">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.4rem; font-size: 0.9rem; color: var(--text-muted);">
-                <span>Subtotal</span>
-                <span>KSh ${subtotal.toLocaleString()}</span>
+            <div style="padding: 1.2rem 1.5rem; border-top: 1px solid var(--border-subtle); background: var(--bg-subtle); flex-shrink: 0;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem; font-size: 0.88rem; color: var(--text-muted);">
+                <span>Subtotal</span><span>KSh ${subtotal.toLocaleString()}</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.9rem; color: var(--text-muted);">
-                <span>VAT (16%)</span>
-                <span>KSh ${tax.toLocaleString()}</span>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.88rem; color: var(--text-muted);">
+                <span>VAT (16%)</span><span>KSh ${tax.toLocaleString()}</span>
               </div>
-              <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 800; color: var(--bg-dark-obsidian); border-top: 1px solid var(--border-strong); padding-top: 0.8rem; margin-top: 0.8rem;">
-                <span>Total Amount</span>
+              <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; border-top: 1px solid var(--border-strong); padding-top: 0.7rem; margin-top: 0.7rem;">
+                <span>Total</span>
                 <span style="color: var(--primary-gold-dark);">KSh ${total.toLocaleString()}</span>
               </div>
-
-              <button class="btn-gold-action" style="width: 100%; margin-top: 1.2rem; padding: 0.9rem;" data-action="open-checkout">
-                Proceed to Order Checkout
+              <button class="btn-gold-action" style="width: 100%; margin-top: 1rem; padding: 1rem; font-size: 1rem;" data-action="open-checkout">
+                ✅ Proceed to Checkout
               </button>
             </div>
           ` : ''}
@@ -2273,65 +2373,63 @@
       const total = subtotal + tax;
 
       modal.innerHTML = `
-        <div class="modal-gold-box" style="padding: 2.5rem; max-width: 600px;">
-          <button class="close-btn-round" data-action="close-checkout">✕</button>
+        <div class="modal-gold-box checkout-modal-box">
+          <button class="close-btn-round" data-action="close-checkout" aria-label="Close checkout">&times;</button>
 
-          <h2 style="margin-bottom: 0.3rem;">Complete Your Order Registration</h2>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.9rem;">Hotline Assistance: <strong>${HOTLINE_PHONE}</strong></p>
+          <h2 style="margin-bottom: 0.3rem; font-size: 1.4rem;">Complete Your Order</h2>
+          <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.88rem;">Need help? Call <strong>${HOTLINE_PHONE}</strong></p>
 
-          <form id="checkoutForm">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+          <form id="checkoutForm" onsubmit="window.app.handleCheckoutSubmit(event)">
+            <div class="checkout-form-grid">
               <div>
-                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">FULL NAME</label>
+                <label class="form-field-label">FULL NAME *</label>
                 <input type="text" name="customerName" class="warm-input" placeholder="e.g. David Mwangi" required>
               </div>
               <div>
-                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">EMAIL ADDRESS</label>
-                <input type="email" name="customerEmail" class="warm-input" placeholder="david@company.com" required>
+                <label class="form-field-label">EMAIL ADDRESS</label>
+                <input type="email" name="customerEmail" class="warm-input" placeholder="david@company.com">
               </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="checkout-form-grid">
               <div>
-                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">PHONE CONTACT</label>
-                <input type="tel" name="customerPhone" class="warm-input" value="${HOTLINE_PHONE}" required>
+                <label class="form-field-label">PHONE NUMBER *</label>
+                <input type="tel" name="customerPhone" class="warm-input" placeholder="07XXXXXXXX" required>
               </div>
               <div>
-                <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">TOWN / CITY</label>
+                <label class="form-field-label">TOWN / CITY *</label>
                 <input type="text" name="customerCity" class="warm-input" placeholder="Nairobi / Mombasa" required>
               </div>
             </div>
 
             <div style="margin-bottom: 1rem;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">DELIVERY ADDRESS</label>
+              <label class="form-field-label">DELIVERY ADDRESS *</label>
               <input type="text" name="customerAddress" class="warm-input" placeholder="Building name, street, or shop location" required>
             </div>
 
             <div style="margin-bottom: 1.5rem;">
-              <label style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 0.3rem;">PAYMENT METHOD</label>
+              <label class="form-field-label">PAYMENT METHOD</label>
               <select name="paymentMethod" class="warm-select" required>
-                <option value="M-Pesa / Mobile Money">Mobile Money (M-Pesa Express)</option>
+                <option value="M-Pesa / Mobile Money">Mobile Money (M-Pesa / Paybill)</option>
+                <option value="Cash on Delivery">Pay on Delivery (Nairobi &amp; Environs)</option>
                 <option value="Credit Card">Credit / Debit Card</option>
-                <option value="Cash on Delivery">Cash / Cheque on Delivery</option>
-                <option value="Bank Transfer">Direct Corporate Bank Transfer</option>
+                <option value="Bank Transfer">Corporate Bank Transfer</option>
               </select>
             </div>
 
             <div style="background: var(--bg-warm-gold); border: 1px solid var(--border-gold); border-radius: var(--radius-md); padding: 1.2rem; margin-bottom: 1.5rem;">
-              <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; color: var(--bg-dark-obsidian);">
-                <span>Total Payable Amount:</span>
+              <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
+                <span>Total Payable:</span>
                 <span style="color: var(--primary-gold-dark);">KSh ${total.toLocaleString()}</span>
               </div>
             </div>
 
-            <button type="submit" class="btn-gold-action" style="width: 100%; padding: 0.9rem;">
-              Confirm & Submit Order
+            <button type="submit" class="btn-gold-action" style="width: 100%; padding: 1rem; font-size: 1rem;">
+              📲 Confirm Order &amp; Send via WhatsApp
             </button>
           </form>
         </div>
       `;
-
-      document.getElementById('checkoutForm').addEventListener('submit', (e) => this.handleCheckoutSubmit(e));
     }
 
     renderReceiptModal() {
@@ -2349,6 +2447,7 @@
       }
 
       const o = this.viewingOrder;
+      const waUrl = o.waUrl || `https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}`;
 
       modal.innerHTML = `
         <div class="modal-gold-box" style="padding: 2.5rem; max-width: 580px;">
@@ -2398,13 +2497,18 @@
           </table>
 
           <div style="display: flex; justify-content: space-between; font-size: 1.2rem; font-weight: 800; border-top: 2px solid var(--bg-dark-obsidian); padding-top: 1rem; margin-bottom: 1.5rem; color: var(--bg-dark-obsidian);">
-            <span>Grand Total Paid</span>
+            <span>Grand Total Amount</span>
             <span style="color: var(--primary-gold-dark);">KSh ${o.totalAmount.toLocaleString()}</span>
           </div>
 
-          <button class="btn-gold-action" style="width: 100%; padding: 0.8rem;" onclick="window.print()">
-            Print Official Invoice
-          </button>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1.2rem;">
+            <a href="${waUrl}" target="_blank" class="btn-whatsapp-direct" style="padding: 0.85rem; justify-content: center; font-size: 0.88rem; font-weight: 800; text-decoration: none;">
+              💬 Send Order Details to WhatsApp
+            </a>
+            <button class="btn-dark-outline" style="padding: 0.85rem; font-size: 0.88rem;" onclick="window.print()">
+              🖨️ Print Invoice
+            </button>
+          </div>
         </div>
       `;
     }

@@ -1081,12 +1081,15 @@ header {
   inset: 0;
   background: rgba(28, 25, 23, 0.72);
   backdrop-filter: blur(6px);
-  z-index: 200;
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 500;   /* Above cart drawer (300) and header (100) */
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1rem;
   animation: fadeIn 0.2s ease-out;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal-gold-box {
@@ -1096,9 +1099,33 @@ header {
   width: 100%;
   max-height: 92vh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   position: relative;
   border: 2px solid var(--border-gold);
   box-shadow: var(--shadow-lg);
+}
+
+/* Checkout modal has its own sizing and padding */
+.checkout-modal-box {
+  max-width: 600px;
+  padding: 2.5rem;
+}
+
+/* Responsive 2-col form grid */
+.checkout-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-field-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.3rem;
+  letter-spacing: 0.03em;
 }
 
 .close-btn-round {
@@ -1121,19 +1148,32 @@ header {
 .close-btn-round:hover { background: var(--primary-gold); color: #ffffff; }
 
 /* ===================== CART DRAWER ===================== */
+
+/* Backdrop behind the cart drawer — tap to close on mobile */
+.cart-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 25, 23, 0.55);
+  z-index: 298;
+  cursor: pointer;
+  animation: fadeIn 0.2s ease-out;
+}
+
 .warm-cart-drawer {
   position: fixed;
   top: 0; right: 0;
-  width: 100%;
+  width: 92%;             /* slightly less than 100% so backdrop is visible on wide phones */
   max-width: 440px;
   height: 100vh;
+  height: 100dvh;         /* dynamic viewport height — fixes iOS address-bar issue */
   background: var(--bg-surface);
   border-left: 2px solid var(--primary-gold);
   z-index: 300;
   display: flex;
   flex-direction: column;
-  box-shadow: -8px 0 32px rgba(28, 25, 23, 0.15);
+  box-shadow: -8px 0 32px rgba(28, 25, 23, 0.25);
   animation: slideInRight 0.25s ease-out;
+  overflow: hidden;       /* let inner scroll area handle overflow */
 }
 
 /* ===================== TRUST PILLARS BAR ===================== */
@@ -1572,14 +1612,46 @@ header {
   z-index: 998;
   background: var(--bg-dark-obsidian);
   color: #ffffff;
-  padding: 1rem 1.5rem;
+  padding: 0.85rem 1.3rem;
   border-radius: var(--radius-lg);
   border-left: 4px solid var(--primary-gold);
   box-shadow: var(--shadow-lg);
   font-size: 0.9rem;
   font-weight: 600;
   animation: slideInRight 0.3s ease-out;
-  max-width: 320px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.toast-action-btn {
+  background: var(--primary-gold);
+  color: #ffffff;
+  border: none;
+  padding: 0.4rem 0.86rem;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+.toast-action-btn:hover {
+  background: var(--primary-gold-hover);
+  transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+  .toast-notification {
+    bottom: 5.5rem;
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+  }
 }
 
 /* ===================== UTILITIES & NAV TABS ===================== */
@@ -1678,11 +1750,32 @@ header {
   .product-price-action-row { flex-wrap: wrap; gap: 0.4rem; }
   .btn-add-cart { padding: 0.5rem 0.7rem; font-size: 0.8rem; }
 
-  .modal-gold-overlay { padding: 0.5rem; align-items: flex-end; }
-  .modal-gold-box { border-radius: var(--radius-xl) var(--radius-xl) 0 0; max-height: 95vh; }
+  .modal-gold-overlay {
+    padding: 0;
+    align-items: flex-end;     /* slide up from bottom on mobile */
+  }
+  .modal-gold-box {
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    max-height: 95vh;
+    max-height: 95dvh;
+  }
+  .checkout-modal-box {
+    padding: 1.5rem 1.2rem 2rem;   /* tighter padding on mobile */
+    max-width: 100%;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  /* Stack checkout form to 1 column on small screens */
+  .checkout-form-grid { grid-template-columns: 1fr; }
 
-  /* Fix 6: Cart drawer must cover full width edge-to-edge */
-  .warm-cart-drawer { max-width: 100%; left: 0; right: 0; }
+  /* Cart drawer: full width on mobile, backdrop left visible as thin strip */
+  .warm-cart-drawer {
+    width: 100%;
+    max-width: 100%;
+    left: 0;
+    right: 0;
+    border-left: none;
+    border-top: 2px solid var(--primary-gold);
+  }
 
   .footer-main { grid-template-columns: 1fr; gap: 1.5rem; padding: 2rem 1rem; }
   /* Fix 10: Footer bottom stacks cleanly on mobile */
