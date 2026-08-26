@@ -29,6 +29,17 @@
   [headers.values]
     Cache-Control = "public, max-age=86400, must-revalidate"
 
+# Ensure HTML pages are never cached at Netlify Edge
+[[headers]]
+  for = "/"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate, no-cache"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate, no-cache"
+
 # Security headers
 [[headers]]
   for = "/*"
