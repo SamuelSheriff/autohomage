@@ -123,6 +123,13 @@
       this.isCheckoutOpen = false;
       this.viewingOrder = null;
 
+      // Grand Launch Promo & 3-Month Countdown State (Sept 1, 2026 - Dec 1, 2026)
+      this.launchTargetDate = new Date('2026-12-01T23:59:59+03:00').getTime();
+      this.launchCouponCode = 'LAUNCH2026';
+      this.appliedCouponCode = 'LAUNCH2026';
+      this.isLaunchModalOpen = false;
+      this.countdownInterval = null;
+
       // Hero Slider State
       this.currentHeroSlide = 0;
       this.heroSlideTimer = null;
@@ -161,6 +168,15 @@
       this.bindEvents();
       await this.fetchBackendData();
       
+      // Start Live 3-Month Grand Launch Countdown Ticker
+      this.startCountdownTimer();
+
+      // Show welcome popup modal for first time visitors
+      if (!sessionStorage.getItem('autohomage_launch_seen')) {
+        this.isLaunchModalOpen = true;
+        sessionStorage.setItem('autohomage_launch_seen', 'true');
+      }
+
       // Secret URL hash / query parameter trigger (#admin or ?admin=true)
       if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
         if (!this.isAdminAuthenticated) {
@@ -276,6 +292,22 @@
         const id = target.dataset.id;
 
         switch (action) {
+          case 'copy-code': {
+            const codeToCopy = target.dataset.code || 'LAUNCH2026';
+            this.copyDiscountCode(codeToCopy);
+            break;
+          }
+
+          case 'open-launch-modal':
+            this.isLaunchModalOpen = true;
+            this.renderLaunchModal();
+            break;
+
+          case 'close-launch-modal':
+            this.isLaunchModalOpen = false;
+            this.renderLaunchModal();
+            break;
+
           case 'toggle-view':
             if (this.activeView === 'store') {
               if (!this.isAdminAuthenticated) {
@@ -830,8 +862,12 @@
       const formData = new FormData(form);
 
       const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      const tax = Math.round(subtotal * 0.16);
-      const total = subtotal + tax;
+      const couponEntered = (formData.get('couponCode') || this.appliedCouponCode || '').trim().toUpperCase();
+      const isDiscountApplied = couponEntered === 'LAUNCH2026' || couponEntered === 'LAUNCH15';
+      const discountAmount = isDiscountApplied ? Math.round(subtotal * 0.15) : 0;
+      const netSubtotal = Math.max(0, subtotal - discountAmount);
+      const tax = Math.round(netSubtotal * 0.16);
+      const total = netSubtotal + tax;
 
       const customerName = formData.get('customerName') || 'Valued Customer';
       const customerPhone = formData.get('customerPhone') || '';
@@ -853,6 +889,9 @@
           ? `${this.activeVehicle.make} ${this.activeVehicle.model} (${this.activeVehicle.year})`
           : 'Universal Order',
         items: [...this.cart],
+        subtotal: subtotal,
+        discountAmount: discountAmount,
+        couponCode: isDiscountApplied ? couponEntered : null,
         totalAmount: total,
         paymentMethod: paymentMethod,
         paymentStatus: paymentMethod === 'Cash on Delivery' ? 'Pending' : 'Paid',
@@ -887,7 +926,7 @@ ${itemLines}
 
 📊 *SUMMARY:*
 • Subtotal: KSh ${subtotal.toLocaleString()}
-• VAT (16%): KSh ${tax.toLocaleString()}
+${isDiscountApplied ? `🎉 *Grand Launch Discount (15% OFF):* -KSh ${discountAmount.toLocaleString()} (Code: ${couponEntered})\n• Net Subtotal: KSh ${netSubtotal.toLocaleString()}\n` : ''}• VAT (16%): KSh ${tax.toLocaleString()}
 💰 *TOTAL AMOUNT:* KSh ${newOrder.totalAmount.toLocaleString()}
 
 Please confirm delivery schedule for this order. Thank you!`;
@@ -1011,6 +1050,138 @@ Please confirm delivery schedule for this order. Thank you!`;
       setTimeout(() => { if (toast.parentNode) toast.remove(); }, 4000);
     }
 
+    startCountdownTimer() {
+      if (this.countdownInterval) clearInterval(this.countdownInterval);
+
+      const updateTimer = () => {
+        const now = Date.now();
+        const diff = Math.max(0, this.launchTargetDate - now);
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+        const formattedDays = String(days).padStart(2, '0');
+        const formattedHours = String(hours).padStart(2, '0');
+        const formattedMins = String(mins).padStart(2, '0');
+        const formattedSecs = String(secs).padStart(2, '0');
+
+        // Main Grand Launch Section Timer Box Elements
+        const cdDaysEl = document.getElementById('cdDays');
+        const cdHoursEl = document.getElementById('cdHours');
+        const cdMinsEl = document.getElementById('cdMins');
+        const cdSecsEl = document.getElementById('cdSecs');
+
+        if (cdDaysEl) cdDaysEl.textContent = formattedDays;
+        if (cdHoursEl) cdHoursEl.textContent = formattedHours;
+        if (cdMinsEl) cdMinsEl.textContent = formattedMins;
+        if (cdSecsEl) cdSecsEl.textContent = formattedSecs;
+
+        // Header Top Sticky Bar Timer Element
+        const headerCdText = document.getElementById('headerCdText');
+        if (headerCdText) {
+          headerCdText.textContent = `${days}d ${formattedHours}h ${formattedMins}m ${formattedSecs}s`;
+        }
+
+        // Modal Countdown Elements if active
+        const modalDaysEl = document.getElementById('modalCdDays');
+        const modalHoursEl = document.getElementById('modalCdHours');
+        const modalMinsEl = document.getElementById('modalCdMins');
+        const modalSecsEl = document.getElementById('modalCdSecs');
+
+        if (modalDaysEl) modalDaysEl.textContent = formattedDays;
+        if (modalHoursEl) modalHoursEl.textContent = formattedHours;
+        if (modalMinsEl) modalMinsEl.textContent = formattedMins;
+        if (modalSecsEl) modalSecsEl.textContent = formattedSecs;
+      };
+
+      updateTimer();
+      this.countdownInterval = setInterval(updateTimer, 1000);
+    }
+
+    copyDiscountCode(code = 'LAUNCH2026') {
+      this.appliedCouponCode = code;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).then(() => {
+          this.showToast(`🎉 Coupon code "${code}" copied! 15% discount will apply at checkout.`, 'SHOP DEALS', () => {
+            document.getElementById('catalogSection')?.scrollIntoView({ behavior: 'smooth' });
+          });
+        }).catch(() => {
+          this.showToast(`🎉 Coupon code "${code}" active for 15% OFF at checkout!`);
+        });
+      } else {
+        this.showToast(`🎉 Coupon code "${code}" active for 15% OFF at checkout!`);
+      }
+    }
+
+    renderLaunchModal() {
+      let modal = document.getElementById('launchModalOverlay');
+      if (!this.isLaunchModalOpen) {
+        if (modal) modal.remove();
+        return;
+      }
+
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'launchModalOverlay';
+        modal.className = 'modal-launch-overlay';
+        document.body.appendChild(modal);
+      }
+
+      modal.innerHTML = `
+        <div class="modal-launch-box">
+          <button class="close-btn-round" data-action="close-launch-modal" aria-label="Close welcome modal">&times;</button>
+          
+          <div class="launch-modal-badge">🚀 OFFICIAL WEBSITE GRAND LAUNCH</div>
+          
+          <h2 class="launch-modal-title">Welcome to <span class="gold-text">Auto Homage</span></h2>
+          <p class="launch-modal-subtitle">
+            We are thrilled to officially launch! To celebrate our debut, enjoy <strong>15% - 25% OFF</strong> across all car care formulas, 3D mats, and accessories for <strong>3 FULL MONTHS</strong>!
+          </p>
+
+          <div class="launch-modal-timer-card">
+            <div class="timer-card-label">⏳ DISCOUNT OFFER ENDS DECEMBER 1, 2026</div>
+            <div class="modal-timer-grid">
+              <div class="m-timer-unit">
+                <span id="modalCdDays">00</span>
+                <small>DAYS</small>
+              </div>
+              <div class="m-timer-sep">:</div>
+              <div class="m-timer-unit">
+                <span id="modalCdHours">00</span>
+                <small>HRS</small>
+              </div>
+              <div class="m-timer-sep">:</div>
+              <div class="m-timer-unit">
+                <span id="modalCdMins">00</span>
+                <small>MINS</small>
+              </div>
+              <div class="m-timer-sep">:</div>
+              <div class="m-timer-unit">
+                <span id="modalCdSecs">00</span>
+                <small>SECS</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="launch-modal-coupon-box" data-action="copy-code" data-code="LAUNCH2026">
+            <div>
+              <span class="coupon-title">SPECIAL LAUNCH CODE:</span>
+              <strong class="coupon-code">LAUNCH2026</strong>
+            </div>
+            <button class="btn-copy-mini">📋 Copy Code (15% OFF)</button>
+          </div>
+
+          <div class="launch-modal-actions">
+            <button class="btn-gold-action" data-action="close-launch-modal" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+              🏷️ Start Shopping Launch Deals
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
     initScrollObserver() {
       setTimeout(() => {
         const elements = document.querySelectorAll('.reveal-on-scroll');
@@ -1072,6 +1243,7 @@ Please confirm delivery schedule for this order. Thank you!`;
       this.renderCheckoutModal();
       this.renderReceiptModal();
       this.renderProductModal();
+      this.renderLaunchModal();
     }
 
     renderFloatingWhatsApp() {
@@ -1101,11 +1273,23 @@ Please confirm delivery schedule for this order. Thank you!`;
       const cartCount = this.cart.reduce((total, item) => total + item.qty, 0);
 
       headerContainer.innerHTML = `
-        <!-- Top Hotline Bar -->
-        <div class="top-hotline-bar">
-          <div class="hotline-group">
-            <span>Official Order Hotline:</span>
-            <a href="tel:${HOTLINE_PHONE}" class="hotline-link">${ICONS.phone} <span>${HOTLINE_PHONE}</span></a>
+        <!-- Sticky Grand Launch Announcement Bar -->
+        <div class="top-launch-announcement-bar">
+          <div class="launch-announcement-content">
+            <div class="launch-pill-group">
+              <span class="launch-sparkle-pill" data-action="open-launch-modal" title="Click to view Grand Launch details">🚀 SEPT 1ST GRAND LAUNCH</span>
+              <span class="launch-bar-msg">3-Month Launch Discount Active! Code: <strong class="code-highlight" data-action="copy-code" data-code="LAUNCH2026" title="Click to copy 15% discount code">LAUNCH2026 📋</strong></span>
+            </div>
+            
+            <div class="launch-bar-right">
+              <div class="launch-bar-timer" data-action="open-launch-modal" title="Click to view full countdown clock">
+                <span>Discount ends in: </span>
+                <strong id="headerCdText">--d --h --m --s</strong>
+              </div>
+              <div class="hotline-group-inline">
+                <a href="tel:${HOTLINE_PHONE}" class="hotline-link">${ICONS.phone} <span>${HOTLINE_PHONE}</span></a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1645,10 +1829,111 @@ Please confirm delivery schedule for this order. Thank you!`;
       });
     }
 
+    renderGrandLaunchBanner() {
+      return `
+        <!-- GRAND LAUNCH WELCOMING BANNER & 3-MONTH LIVE COUNTDOWN -->
+        <section id="grandLaunchBanner" class="grand-launch-container reveal-on-scroll" data-animate="fade-up">
+          <div class="launch-banner-card">
+            <div class="launch-card-badge">
+              <span class="pulse-icon">⚡</span>
+              <span>OFFICIAL SEPTEMBER 1ST WEBSITE GRAND LAUNCH</span>
+              <span class="pulse-icon">⚡</span>
+            </div>
+
+            <h1 class="launch-main-title">
+              WELCOME TO <span class="gold-gradient-text">AUTO HOMAGE</span>
+            </h1>
+            
+            <p class="launch-description">
+              We are officially live! To celebrate our Grand Launch, enjoy exclusive discount offers on all genuine car care products, Gladiator formulas, custom 3D floor mats, and vehicle parts for <strong>3 FULL MONTHS</strong>!
+            </p>
+
+            <!-- LIVE COUNTDOWN TIMER CARD -->
+            <div class="countdown-wrapper">
+              <div class="countdown-header">
+                <span class="live-dot"></span>
+                <span class="countdown-heading">3-MONTH LAUNCH DISCOUNT COUNTDOWN</span>
+                <span class="countdown-dates">(Sept 1, 2026 — Dec 1, 2026)</span>
+              </div>
+
+              <div class="countdown-timer-grid">
+                <div class="timer-box">
+                  <div class="timer-value" id="cdDays">00</div>
+                  <div class="timer-label">DAYS</div>
+                </div>
+                <div class="timer-colon">:</div>
+                <div class="timer-box">
+                  <div class="timer-value" id="cdHours">00</div>
+                  <div class="timer-label">HOURS</div>
+                </div>
+                <div class="timer-colon">:</div>
+                <div class="timer-box">
+                  <div class="timer-value" id="cdMins">00</div>
+                  <div class="timer-label">MINUTES</div>
+                </div>
+                <div class="timer-colon">:</div>
+                <div class="timer-box">
+                  <div class="timer-value" id="cdSecs">00</div>
+                  <div class="timer-label">SECONDS</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- DISCOUNT COUPON & ACTION BUTTONS -->
+            <div class="launch-action-row">
+              <div class="coupon-code-card" data-action="copy-code" data-code="LAUNCH2026" title="Click to copy 15% discount code">
+                <div class="coupon-tag">LAUNCH DISCOUNT COUPON</div>
+                <div class="coupon-val-group">
+                  <span class="coupon-code-text">LAUNCH2026</span>
+                  <span class="coupon-copy-badge">📋 COPY (15% OFF)</span>
+                </div>
+              </div>
+
+              <div class="launch-cta-buttons">
+                <a href="#catalogSection" class="btn-launch-primary" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+                  🏷️ Shop Discounted Products
+                </a>
+                <a href="tel:${HOTLINE_PHONE}" class="btn-launch-secondary">
+                  📞 Call Order Hotline
+                </a>
+              </div>
+            </div>
+
+            <!-- KEY PROMO HIGHLIGHTS -->
+            <div class="launch-highlights-bar">
+              <div class="highlight-item">
+                <span class="hl-icon">🎉</span>
+                <div>
+                  <div class="hl-title">Grand Launch Discounts</div>
+                  <div class="hl-desc">15% - 25% Off Storewide</div>
+                </div>
+              </div>
+              <div class="highlight-item">
+                <span class="hl-icon">⏳</span>
+                <div>
+                  <div class="hl-title">Valid for 3 Months</div>
+                  <div class="hl-desc">Sept 1 to Dec 1, 2026</div>
+                </div>
+              </div>
+              <div class="highlight-item">
+                <span class="hl-icon">🚚</span>
+                <div>
+                  <div class="hl-title">Pay on Delivery</div>
+                  <div class="hl-desc">Nairobi &amp; Countrywide Express</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
     renderStorefront() {
       const container = document.getElementById('appContent');
 
       container.innerHTML = `
+        ${this.renderGrandLaunchBanner()}
+
         <!-- HIGH IMPACT AUTOMOTIVE HERO CAROUSEL SLIDER -->
         <section id="heroSliderContainer" class="hero-slider-wrapper reveal-on-scroll" data-animate="fade-up">
           <div class="hero-slider-track">
@@ -2369,15 +2654,27 @@ Please confirm delivery schedule for this order. Thank you!`;
       }
 
       const subtotal = this.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-      const tax = Math.round(subtotal * 0.16);
-      const total = subtotal + tax;
+      const isDiscountApplied = this.appliedCouponCode && (this.appliedCouponCode.toUpperCase() === 'LAUNCH2026' || this.appliedCouponCode.toUpperCase() === 'LAUNCH15');
+      const discountAmount = isDiscountApplied ? Math.round(subtotal * 0.15) : 0;
+      const netSubtotal = Math.max(0, subtotal - discountAmount);
+      const tax = Math.round(netSubtotal * 0.16);
+      const total = netSubtotal + tax;
 
       modal.innerHTML = `
         <div class="modal-gold-box checkout-modal-box">
           <button class="close-btn-round" data-action="close-checkout" aria-label="Close checkout">&times;</button>
 
           <h2 style="margin-bottom: 0.3rem; font-size: 1.4rem;">Complete Your Order</h2>
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.88rem;">Need help? Call <strong>${HOTLINE_PHONE}</strong></p>
+          <p style="color: var(--text-muted); margin-bottom: 1.2rem; font-size: 0.88rem;">Need help? Call <strong>${HOTLINE_PHONE}</strong></p>
+
+          <!-- Grand Launch Promo Banner inside Checkout -->
+          <div class="checkout-launch-alert">
+            <span class="alert-icon">🎁</span>
+            <div>
+              <strong>September 1st Grand Launch Discount Active!</strong>
+              <div style="font-size: 0.78rem; opacity: 0.9;">Code <em>${this.appliedCouponCode || 'LAUNCH2026'}</em> saved you KSh ${discountAmount.toLocaleString()} (15% OFF)!</div>
+            </div>
+          </div>
 
           <form id="checkoutForm" onsubmit="window.app.handleCheckoutSubmit(event)">
             <div class="checkout-form-grid">
@@ -2407,18 +2704,38 @@ Please confirm delivery schedule for this order. Thank you!`;
               <input type="text" name="customerAddress" class="warm-input" placeholder="Building name, street, or shop location" required>
             </div>
 
-            <div style="margin-bottom: 1.5rem;">
-              <label class="form-field-label">PAYMENT METHOD</label>
-              <select name="paymentMethod" class="warm-select" required>
-                <option value="M-Pesa / Mobile Money">Mobile Money (M-Pesa / Paybill)</option>
-                <option value="Cash on Delivery">Pay on Delivery (Nairobi &amp; Environs)</option>
-                <option value="Credit Card">Credit / Debit Card</option>
-                <option value="Bank Transfer">Corporate Bank Transfer</option>
-              </select>
+            <div class="checkout-form-grid" style="margin-bottom: 1rem;">
+              <div>
+                <label class="form-field-label">PAYMENT METHOD</label>
+                <select name="paymentMethod" class="warm-select" required>
+                  <option value="M-Pesa / Mobile Money">Mobile Money (M-Pesa / Paybill)</option>
+                  <option value="Cash on Delivery">Pay on Delivery (Nairobi &amp; Environs)</option>
+                  <option value="Credit Card">Credit / Debit Card</option>
+                  <option value="Bank Transfer">Corporate Bank Transfer</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-field-label">DISCOUNT COUPON CODE</label>
+                <input type="text" name="couponCode" class="warm-input" value="${this.appliedCouponCode || 'LAUNCH2026'}" placeholder="LAUNCH2026" style="text-transform: uppercase; font-weight: 700; color: var(--primary-gold-dark);">
+              </div>
             </div>
 
             <div style="background: var(--bg-warm-gold); border: 1px solid var(--border-gold); border-radius: var(--radius-md); padding: 1.2rem; margin-bottom: 1.5rem;">
-              <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-weight: 800;">
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.3rem;">
+                <span>Cart Subtotal:</span>
+                <span>KSh ${subtotal.toLocaleString()}</span>
+              </div>
+              ${isDiscountApplied ? `
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: #16a34a; font-weight: 700; margin-bottom: 0.3rem;">
+                  <span>Grand Launch Discount (15% OFF):</span>
+                  <span>-KSh ${discountAmount.toLocaleString()}</span>
+                </div>
+              ` : ''}
+              <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.6rem;">
+                <span>VAT (16%):</span>
+                <span>KSh ${tax.toLocaleString()}</span>
+              </div>
+              <div style="display: flex; justify-content: space-between; font-size: 1.15rem; font-weight: 800; border-top: 1px dashed var(--border-strong); padding-top: 0.6rem;">
                 <span>Total Payable:</span>
                 <span style="color: var(--primary-gold-dark);">KSh ${total.toLocaleString()}</span>
               </div>
