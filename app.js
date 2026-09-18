@@ -40,7 +40,7 @@
   const HERO_SLIDES = [
     {
       id: 0,
-      image: 'Hero Image Carousel/hero_car.png',
+      image: 'Hero Image Carousel/hero_car.webp',
       kicker: '🛡️ CERTIFIED GENUINE AUTOMOTIVE CARE & SPARES • AUTHORIZED DISTRIBUTOR',
       title: 'QUALITY PARTS.<br><span class="hero-gold-gradient">PREMIUM CARE.</span>',
       desc: 'Discover high-gloss detailing formulas, nano ceramic wax shields, custom-fit 3D mats, and precision engine spares. Serving vehicle owners, garages & wholesale dealers across Kenya.',
@@ -49,7 +49,7 @@
     },
     {
       id: 1,
-      image: 'Hero Image Carousel/Products Showcase.png',
+      image: 'Hero Image Carousel/Products Showcase.webp',
       kicker: '✨ GLADIATOR & FLAMINGO OFFICIAL CATALOG',
       title: 'PREMIUM DETAILING &<br><span class="hero-gold-gradient">CAR CARE FORMULAS</span>',
       desc: 'Keep your vehicle showroom clean with multi-purpose degreasers, tyre shines, dashboard polishes, and ceramic spray wax. Wholesale carton rates available.',
@@ -58,7 +58,7 @@
     },
     {
       id: 2,
-      image: 'Hero Image Carousel/Interior & Mats.png',
+      image: 'Hero Image Carousel/Interior & Mats.webp',
       kicker: '🚗 CUSTOM VEHICLE ACCESSORIES',
       title: 'CUSTOM FIT 3D MATS &<br><span class="hero-gold-gradient">LUXURY INTERIORS</span>',
       desc: 'All-weather 3D bucket floor mats, premium leather steering covers, and interior protections tailor-made for your vehicle make, model, and year.',
@@ -67,7 +67,7 @@
     },
     {
       id: 3,
-      image: 'Hero Image Carousel/Mechanic Scene.png',
+      image: 'Hero Image Carousel/Mechanic Scene.webp',
       kicker: '🔧 ENGINE & BRAKE MAINTENANCE',
       title: 'PRECISION SERVICE &<br><span class="hero-gold-gradient">GENUINE OEM SPARES</span>',
       desc: 'High-durability iridium spark plugs, ceramic brake pads, oil filters, and suspension parts for smooth, reliable performance on Kenya roads.',
@@ -76,7 +76,7 @@
     },
     {
       id: 4,
-      image: 'Hero Image Carousel/Speedometer.png',
+      image: 'Hero Image Carousel/Speedometer.webp',
       kicker: '🚀 NATIONWIDE EXPRESS DELIVERY',
       title: 'FAST DELIVERY ACROSS<br><span class="hero-gold-gradient">ALL 47 COUNTIES</span>',
       desc: 'Same-day Pay on Delivery in Nairobi & environs. Bulk wholesale carton discounts available for garages, auto dealers, and spare part retailers.',
@@ -158,6 +158,25 @@
         if (window.supabase && config && config.url && config.anonKey && !config.url.includes('YOUR_SUPABASE_PROJECT_URL')) {
           this.supabaseClient = window.supabase.createClient(config.url, config.anonKey);
           console.log('[INFO] Supabase database client initialized successfully.');
+
+          // Restore Supabase Auth session if active
+          this.supabaseClient.auth.getSession().then(({ data }) => {
+            if (data && data.session && data.session.user) {
+              this.isAdminAuthenticated = true;
+              sessionStorage.setItem('autohomage_admin_auth', 'true');
+            }
+          }).catch(() => {});
+
+          // Listen to Supabase Auth changes
+          this.supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (session && session.user) {
+              this.isAdminAuthenticated = true;
+              sessionStorage.setItem('autohomage_admin_auth', 'true');
+            } else if (event === 'SIGNED_OUT') {
+              this.isAdminAuthenticated = false;
+              sessionStorage.removeItem('autohomage_admin_auth');
+            }
+          });
         }
       } catch (err) {
         this.supabaseClient = null;
@@ -331,6 +350,9 @@
             break;
 
           case 'admin-logout':
+            if (this.supabaseClient) {
+              this.supabaseClient.auth.signOut().catch(() => {});
+            }
             this.isAdminAuthenticated = false;
             sessionStorage.removeItem('autohomage_admin_auth');
             this.activeView = 'store';
@@ -477,6 +499,24 @@
           case 'set-hero-slide':
             this.goToHeroSlide(parseInt(id));
             break;
+
+          case 'notify-restock': {
+            const p = this.products.find(item => item.id === id);
+            if (!p) break;
+            const restockMsg = encodeURIComponent(
+              `Hello Auto Homage! Please notify me when "${p.name}" (SKU: ${p.code}) is back in stock.`
+            );
+            window.open(`https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}?text=${restockMsg}`, '_blank');
+            break;
+          }
+        }
+      });
+
+      // Close autocomplete dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#productSearchInput') && !e.target.closest('#searchAutocompleteBox')) {
+          const autoBox = document.getElementById('searchAutocompleteBox');
+          if (autoBox) autoBox.remove();
         }
       });
 
@@ -485,11 +525,63 @@
           this.searchQuery = e.target.value.toLowerCase();
           this.currentPage = 1;
           this.renderProductsList();
+          this.renderSearchAutocomplete(e.target);
         } else if (e.target.id === 'adminInventorySearch') {
           this.adminSearchQuery = e.target.value.toLowerCase();
           this.renderAdminInventoryTable();
         }
       });
+    }
+
+    renderSearchAutocomplete(inputEl) {
+      let dropdown = document.getElementById('searchAutocompleteBox');
+      const query = (inputEl.value || '').trim().toLowerCase();
+
+      if (!query || query.length < 2) {
+        if (dropdown) dropdown.remove();
+        return;
+      }
+
+      const matches = this.products.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.code.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query)
+      ).slice(0, 6);
+
+      if (matches.length === 0) {
+        if (dropdown) dropdown.remove();
+        return;
+      }
+
+      if (!dropdown) {
+        dropdown = document.createElement('div');
+        dropdown.id = 'searchAutocompleteBox';
+        dropdown.className = 'search-autocomplete-dropdown';
+        inputEl.parentNode.appendChild(dropdown);
+      }
+
+      dropdown.innerHTML = `
+        ${matches.map(p => {
+          const displayPrice = this.priceMode === 'carton' ? p.ctnPrice : p.price;
+          return `
+            <div class="search-auto-item" data-action="view-product" data-id="${p.id}">
+              <img src="${p.image}" alt="${p.name}" class="search-auto-thumb" onerror="this.src='Products/Gradiator Products/Multi-Purpose Degreaser.jpg'">
+              <div class="search-auto-info">
+                <div class="search-auto-title">${p.name}</div>
+                <div class="search-auto-meta">
+                  <span class="search-auto-sku">${p.code}</span>
+                  <span class="search-auto-price">KSh ${displayPrice.toLocaleString()}</span>
+                  <span style="font-size: 0.72rem; color: ${p.stock > 0 ? '#15803d' : '#991b1b'};">${p.stock > 0 ? '✓ In Stock' : '✕ Out of Stock'}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+        <div class="search-auto-view-all" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+          View all matching results for "${query}" →
+        </div>
+      `;
     }
 
     handleDirectWhatsAppOrder(productId) {
@@ -610,6 +702,44 @@
       const username = e.target.adminUsername.value.trim();
       const pass = e.target.adminPassword.value;
 
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Verifying Credentials...';
+      }
+
+      // 1. Try Supabase Auth first (Secure Email + Password)
+      if (this.supabaseClient) {
+        try {
+          const emailInput = username.includes('@') ? username : `${username}@autohomage.com`;
+          const { data, error } = await this.supabaseClient.auth.signInWithPassword({
+            email: emailInput,
+            password: pass
+          });
+
+          if (!error && data && data.session) {
+            this.adminLoginAttempts = 0;
+            this.adminLockoutUntil = 0;
+            this.isAdminAuthenticated = true;
+            sessionStorage.setItem('autohomage_admin_auth', 'true');
+            this.isAdminAuthModalOpen = false;
+            this.renderAdminAuthModal();
+            this.activeView = 'admin';
+            this.render();
+            this.showToast('Supabase Authentication Successful. Welcome, Admin.');
+            if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Secure Admin Login →'; }
+            return;
+          }
+        } catch (supabaseAuthErr) {
+          // Fall back to local check
+        }
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Secure Admin Login →';
+      }
+
+      // 2. Local fallback credential check
       const isValid = (username.toLowerCase() === 'dauti' && pass === this.adminPassword);
 
       if (isValid) {
@@ -621,7 +751,7 @@
         this.renderAdminAuthModal();
         this.activeView = 'admin';
         this.render();
-        this.showToast('Authentication Successful. Welcome, Dauti.');
+        this.showToast('Local Authentication Successful. Welcome, Dauti.');
       } else {
         this.adminLoginAttempts = (this.adminLoginAttempts || 0) + 1;
         if (errEl) {
@@ -631,7 +761,7 @@
             errEl.innerHTML = `🛑 Too many failed attempts. Security lockout active for 30 seconds.`;
           } else {
             const left = 5 - this.adminLoginAttempts;
-            errEl.innerHTML = `✕ Invalid username or password. (${left} attempt${left > 1 ? 's' : ''} remaining before lockout)`;
+            errEl.innerHTML = `✕ Invalid credentials. (${left} attempt${left > 1 ? 's' : ''} remaining before lockout)`;
           }
         }
       }
@@ -2402,6 +2532,18 @@ Please confirm delivery schedule for this order. Thank you!`;
         const singleTotal = p.price * p.pcsPerCtn;
         const cartonSavingsPct = singleTotal > p.ctnPrice ? Math.round(((singleTotal - p.ctnPrice) / singleTotal) * 100) : 15;
 
+        // Vehicle fitment badge
+        let fitmentBadgeHtml = '';
+        if (this.activeVehicle.make) {
+          if (!p.isUniversal && p.fitment) {
+            fitmentBadgeHtml = `<div class="badge-fit-guaranteed">✓ Direct Fit: ${this.activeVehicle.make} ${this.activeVehicle.model} (${this.activeVehicle.year})</div>`;
+          } else if (p.isUniversal) {
+            fitmentBadgeHtml = `<div class="badge-fit-universal">✓ Universal Vehicle Fitment</div>`;
+          }
+        }
+
+        const isOutOfStock = p.stock <= 0;
+
         return `
           <div class="luxury-product-card reveal-on-scroll" data-animate="fade-up" data-delay="${delay}">
             <div class="product-image-container" data-action="view-product" data-id="${p.id}">
@@ -2409,11 +2551,12 @@ Please confirm delivery schedule for this order. Thank you!`;
               <div class="badge-tag-stack">
                 <span class="tag-brand-pill">${p.brand.replace('_', ' ')}</span>
                 ${this.priceMode === 'carton' ? `<span class="badge-discount-tag">SAVE ${cartonSavingsPct}%</span>` : (singleSavingsPct > 0 ? `<span class="badge-discount-tag">-${singleSavingsPct}% OFF</span>` : '')}
-                ${p.stock > 10 ? `<span class="badge-stock-in">In Stock</span>` : `<span class="badge-stock-low">Low Stock (${p.stock})</span>`}
+                ${isOutOfStock ? `<span class="badge-stock-low" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;">Out of Stock</span>` : (p.stock > 10 ? `<span class="badge-stock-in">In Stock</span>` : `<span class="badge-stock-low">Low Stock (${p.stock})</span>`)}
               </div>
             </div>
 
             <div class="product-info-body">
+              ${fitmentBadgeHtml}
               <div class="sku-code-label">SKU: ${p.code}</div>
               <h4 class="product-title-text" data-action="view-product" data-id="${p.id}">${p.name}</h4>
               
@@ -2435,10 +2578,16 @@ Please confirm delivery schedule for this order. Thank you!`;
                   <button class="btn-whatsapp-direct" data-action="order-whatsapp-product" data-id="${p.id}" title="Order directly on WhatsApp">
                     💬
                   </button>
-                  <button class="btn-add-cart" data-action="add-to-cart" data-id="${p.id}">
-                    ${ICONS.cart}
-                    <span>Add</span>
-                  </button>
+                  ${isOutOfStock ? `
+                    <button class="btn-restock-notify" data-action="notify-restock" data-id="${p.id}" title="Notify on WhatsApp when back in stock">
+                      <span>📲</span> <span>Alert</span>
+                    </button>
+                  ` : `
+                    <button class="btn-add-cart" data-action="add-to-cart" data-id="${p.id}">
+                      ${ICONS.cart}
+                      <span>Add</span>
+                    </button>
+                  `}
                 </div>
               </div>
 

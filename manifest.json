@@ -1,0 +1,19 @@
+{
+  "name": "Auto Homage Kenya - Car Care & Auto Spares",
+  "short_name": "Auto Homage",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf6f0",
+  "theme_color": "#1c1917",
+  "description": "Kenya's premier authorized distributor for Gladiator Car Care, Flamingo formulas, custom 3D mats, and genuine auto spares.",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "automotive", "business"]
+}

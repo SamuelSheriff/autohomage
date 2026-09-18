@@ -43,19 +43,64 @@ CREATE TABLE IF NOT EXISTS public.orders (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 3. Enable Row Level Security (RLS) & Set Permissive Policies for Web App Access
+-- 3. Create Reviews Table
+CREATE TABLE IF NOT EXISTS public.reviews (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id TEXT NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+    author_name TEXT NOT NULL,
+    rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- 4. Enable Row Level Security (RLS) & Set Production Security Policies
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow anonymous read access on products" ON public.products FOR SELECT USING (true);
-CREATE POLICY "Allow anonymous insert access on products" ON public.products FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow anonymous update access on products" ON public.products FOR UPDATE USING (true);
+-- Products: Public can view; only Authenticated Admin can insert/update/delete
+DROP POLICY IF EXISTS "Allow anonymous read access on products" ON public.products;
+DROP POLICY IF EXISTS "Allow anonymous insert access on products" ON public.products;
+DROP POLICY IF EXISTS "Allow anonymous update access on products" ON public.products;
+DROP POLICY IF EXISTS "Allow authenticated admin manage products" ON public.products;
 
-CREATE POLICY "Allow anonymous read access on orders" ON public.orders FOR SELECT USING (true);
-CREATE POLICY "Allow anonymous insert access on orders" ON public.orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow anonymous update access on orders" ON public.orders FOR UPDATE USING (true);
+CREATE POLICY "Allow public read access on products" ON public.products 
+    FOR SELECT USING (true);
 
--- 4. Seed Initial Products Data
+CREATE POLICY "Allow authenticated admin insert products" ON public.products 
+    FOR INSERT TO authenticated WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated admin update products" ON public.products 
+    FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated admin delete products" ON public.products 
+    FOR DELETE TO authenticated USING (true);
+
+-- Orders: Public can submit orders at checkout; only Authenticated Admin can view/update customer orders
+DROP POLICY IF EXISTS "Allow anonymous read access on orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow anonymous insert access on orders" ON public.orders;
+DROP POLICY IF EXISTS "Allow anonymous update access on orders" ON public.orders;
+
+CREATE POLICY "Allow public submit order" ON public.orders 
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated admin view orders" ON public.orders 
+    FOR SELECT TO authenticated USING (true);
+
+CREATE POLICY "Allow authenticated admin update orders" ON public.orders 
+    FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+-- Reviews: Public can read and submit reviews; Admin can moderate/delete
+CREATE POLICY "Allow public read reviews" ON public.reviews 
+    FOR SELECT USING (true);
+
+CREATE POLICY "Allow public submit reviews" ON public.reviews 
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated admin delete reviews" ON public.reviews 
+    FOR DELETE TO authenticated USING (true);
+
+-- 5. Seed Initial Products Data
 INSERT INTO public.products (id, code, name, brand, category, section, price, ctn_price, pcs_per_ctn, rating, reviews, stock, image, description, is_universal, fitment_json)
 VALUES
 ('AH-GT-0610', 'F0610', 'Gladiator Tyre Inflator Big 12V (Heavy Duty)', 'gladiator', 'tools_safety', 'universal', 3000, 3000, 1, 4.9, 42, 15, 'Products/Gradiator Products/Multi-Purpose Degreaser.jpg', 'Heavy duty 12V 2-cylinder air compressor inflator. Powers directly from battery clips or cigarette lighter socket.', true, null),

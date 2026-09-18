@@ -3092,3 +3092,152 @@ header {
   .launch-cta-buttons { width: 100%; flex-direction: column; }
   .btn-launch-primary, .btn-launch-secondary { width: 100%; justify-content: center; }
 }
+
+/* ============================================================
+   8. ENHANCED SEARCH AUTOCOMPLETE & LIVE PREVIEW DROPDOWN
+   ============================================================ */
+.search-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-md);
+  box-shadow: 0 12px 28px rgba(28, 25, 23, 0.18);
+  z-index: 99;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.search-auto-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.search-auto-item:last-child {
+  border-bottom: none;
+}
+
+.search-auto-item:hover {
+  background: var(--bg-warm-gold);
+}
+
+.search-auto-thumb {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fbf8f3;
+  padding: 2px;
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.search-auto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.search-auto-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-auto-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+  font-size: 0.76rem;
+}
+
+.search-auto-sku {
+  color: var(--text-muted);
+  font-family: monospace;
+}
+
+.search-auto-price {
+  color: var(--primary-gold-dark);
+  font-weight: 800;
+}
+
+.search-auto-view-all {
+  display: block;
+  text-align: center;
+  padding: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-gold-dark);
+  background: var(--primary-gold-light);
+  cursor: pointer;
+  border-top: 1px solid var(--border-gold);
+}
+
+.search-auto-view-all:hover {
+  background: #fdecc8;
+}
+
+/* ============================================================
+   9. VEHICLE FITMENT VERIFICATION BADGE & RESTOCK NOTIFY
+   ============================================================ */
+.badge-fit-guaranteed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 9999px;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.badge-fit-universal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.btn-restock-notify {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  background: #25D366;
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-restock-notify:hover {
+  background: #1eb954;
+  transform: translateY(-1px);
+}
+
