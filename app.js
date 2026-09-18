@@ -136,6 +136,7 @@
 
       // Mobile Navigation Drawer State
       this.isMobileMenuOpen = false;
+      this.isLaunchBannerCollapsed = false;
 
       // Admin Authentication & Sub-Tab State
       this.adminPassword = localStorage.getItem('autohomage_admin_password') || '@Angel10';
@@ -189,6 +190,22 @@
       
       // Start Live 3-Month Grand Launch Countdown Ticker
       this.startCountdownTimer();
+
+      // Mobile Smart Scroll: Collapse top announcement bar & auto-close menu on scroll down
+      let lastScrollY = window.scrollY;
+      window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        if (currentScrollY > 60 && currentScrollY > lastScrollY) {
+          document.body.classList.add('mobile-scrolled-down');
+          if (this.isMobileMenuOpen) {
+            this.isMobileMenuOpen = false;
+            this.renderHeader();
+          }
+        } else if (currentScrollY < lastScrollY || currentScrollY <= 20) {
+          document.body.classList.remove('mobile-scrolled-down');
+        }
+        lastScrollY = currentScrollY;
+      }, { passive: true });
 
       // Show welcome popup modal for first time visitors
       if (!sessionStorage.getItem('autohomage_launch_seen')) {
@@ -316,6 +333,18 @@
             this.copyDiscountCode(codeToCopy);
             break;
           }
+
+          case 'toggle-launch-collapse':
+            this.isLaunchBannerCollapsed = !this.isLaunchBannerCollapsed;
+            const bannerEl = document.getElementById('grandLaunchBanner');
+            if (bannerEl) {
+              bannerEl.classList.toggle('is-collapsed', this.isLaunchBannerCollapsed);
+              const toggleBtnText = bannerEl.querySelector('.btn-launch-collapse-toggle span');
+              if (toggleBtnText) {
+                toggleBtnText.textContent = this.isLaunchBannerCollapsed ? '▼ Expand Offer Details' : '▲ Collapse Offer';
+              }
+            }
+            break;
 
           case 'open-launch-modal':
             this.isLaunchModalOpen = true;
@@ -1433,7 +1462,7 @@ Please confirm delivery schedule for this order. Thank you!`;
             </div>
           </a>
 
-          <!-- Center Navigation Links matching reference design -->
+          <!-- Center Navigation Links (Desktop) -->
           ${this.activeView === 'store' ? `
             <nav class="center-nav-links">
               <a href="#" class="nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">HOME</a>
@@ -1447,7 +1476,7 @@ Please confirm delivery schedule for this order. Thank you!`;
           <div class="header-action-group">
             <a href="tel:${HOTLINE_PHONE}" class="call-hotline-btn">
               ${ICONS.phone}
-              <span>Call ${HOTLINE_PHONE}</span>
+              <span class="hotline-btn-text">Call ${HOTLINE_PHONE}</span>
             </a>
 
             <!-- Hide Admin Portal trigger button from regular customers when unauthenticated -->
@@ -1461,12 +1490,12 @@ Please confirm delivery schedule for this order. Thank you!`;
             ${this.activeView === 'store' ? `
               <button class="cart-drawer-trigger" data-action="open-cart">
                 ${ICONS.cart}
-                <span>Cart</span>
+                <span class="cart-btn-label">Cart</span>
                 <span class="cart-count-badge" id="cartBadgeCount">${cartCount}</span>
               </button>
 
               <!-- Mobile Hamburger Menu Button -->
-              <button class="mobile-menu-trigger" data-action="toggle-mobile-menu" aria-label="Toggle Mobile Navigation">
+              <button class="mobile-menu-trigger ${this.isMobileMenuOpen ? 'active' : ''}" data-action="toggle-mobile-menu" aria-label="Toggle Mobile Navigation">
                 ${this.isMobileMenuOpen ? '✕' : '☰'}
               </button>
             ` : ''}
@@ -1475,22 +1504,80 @@ Please confirm delivery schedule for this order. Thank you!`;
 
         <!-- Collapsible Mobile Navigation Drawer -->
         ${(this.activeView === 'store' && this.isMobileMenuOpen) ? `
+          <div class="mobile-nav-backdrop" data-action="close-mobile-menu"></div>
           <nav class="mobile-nav-menu">
-            <a href="#" class="mobile-nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">
-              <span>🏠</span> HOME
-            </a>
-            <a href="#catalogSection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
-              <span>🛒</span> SHOP CATALOG
-            </a>
-            <a href="#categorySection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('categorySection')?.scrollIntoView({behavior:'smooth'})">
-              <span>🏷️</span> CATEGORIES
-            </a>
-            <a href="#" class="mobile-nav-link ${this.activePage === 'about' ? 'active' : ''}" data-action="set-page" data-id="about">
-              <span>🏆</span> ABOUT US
-            </a>
-            <a href="#" class="mobile-nav-link ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">
-              <span>📞</span> CONTACT US
-            </a>
+            <div class="mobile-nav-header">
+              <div class="mobile-nav-title">Navigation Menu</div>
+              <button class="mobile-nav-close-btn" data-action="close-mobile-menu" aria-label="Close menu">&times;</button>
+            </div>
+
+            <div class="mobile-nav-links-grid">
+              <a href="#" class="mobile-nav-link ${this.activePage === 'shop' ? 'active' : ''}" data-action="set-page" data-id="shop">
+                <span class="mobile-nav-icon">🏠</span>
+                <div class="mobile-nav-text">
+                  <strong>Home</strong>
+                  <small>Welcome &amp; Hero Showcase</small>
+                </div>
+              </a>
+
+              <a href="#catalogSection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+                <span class="mobile-nav-icon">🛒</span>
+                <div class="mobile-nav-text">
+                  <strong>Shop All Catalog</strong>
+                  <small>Car Care, Cleaners &amp; Spares</small>
+                </div>
+              </a>
+
+              <a href="#categorySection" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('categorySection')?.scrollIntoView({behavior:'smooth'})">
+                <span class="mobile-nav-icon">🏷️</span>
+                <div class="mobile-nav-text">
+                  <strong>Shop by Category</strong>
+                  <small>Exterior, 3D Mats, Service</small>
+                </div>
+              </a>
+
+              <a href="#ymmForm" class="mobile-nav-link" data-action="close-mobile-menu" onclick="document.getElementById('ymmForm')?.scrollIntoView({behavior:'smooth'})">
+                <span class="mobile-nav-icon">🚗</span>
+                <div class="mobile-nav-text">
+                  <strong>Vehicle Part Matcher</strong>
+                  <small>Fit Spares to Your Car</small>
+                </div>
+              </a>
+
+              <a href="#catalogSection" class="mobile-nav-link" data-action="set-pricemode" data-id="carton" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'}); window.app.isMobileMenuOpen=false; window.app.renderHeader();">
+                <span class="mobile-nav-icon">📦</span>
+                <div class="mobile-nav-text">
+                  <strong>Wholesale Carton Deals</strong>
+                  <small>Garage &amp; Retailer Bulk Rates</small>
+                </div>
+              </a>
+
+              <a href="#" class="mobile-nav-link ${this.activePage === 'about' ? 'active' : ''}" data-action="set-page" data-id="about">
+                <span class="mobile-nav-icon">🏆</span>
+                <div class="mobile-nav-text">
+                  <strong>About Auto Homage</strong>
+                  <small>Authorized Kenya Distributor</small>
+                </div>
+              </a>
+
+              <a href="#" class="mobile-nav-link ${this.activePage === 'contact' ? 'active' : ''}" data-action="set-page" data-id="contact">
+                <span class="mobile-nav-icon">📞</span>
+                <div class="mobile-nav-text">
+                  <strong>Contact &amp; Support</strong>
+                  <small>Order Hotline &amp; Location</small>
+                </div>
+              </a>
+            </div>
+
+            <!-- Mobile Quick Contact Strip -->
+            <div class="mobile-nav-footer">
+              <a href="tel:${HOTLINE_PHONE}" class="mobile-nav-call-btn">
+                ${ICONS.phone} <span>Call ${HOTLINE_PHONE}</span>
+              </a>
+              <a href="https://wa.me/254${HOTLINE_PHONE.replace(/^0/, '')}" target="_blank" class="mobile-nav-wa-btn" data-action="close-mobile-menu">
+                💬 <span>WhatsApp</span>
+              </a>
+            </div>
           </nav>
         ` : ''}
       `;
@@ -1962,94 +2049,113 @@ Please confirm delivery schedule for this order. Thank you!`;
     renderGrandLaunchBanner() {
       return `
         <!-- GRAND LAUNCH WELCOMING BANNER & 3-MONTH LIVE COUNTDOWN -->
-        <section id="grandLaunchBanner" class="grand-launch-container reveal-on-scroll" data-animate="fade-up">
+        <section id="grandLaunchBanner" class="grand-launch-container ${this.isLaunchBannerCollapsed ? 'is-collapsed' : ''} reveal-on-scroll" data-animate="fade-up">
           <div class="launch-banner-card">
-            <div class="launch-card-badge">
-              <span class="pulse-icon">⚡</span>
-              <span>OFFICIAL SEPTEMBER 1ST WEBSITE GRAND LAUNCH</span>
-              <span class="pulse-icon">⚡</span>
+            <!-- Mobile Mini Collapsed Strip (Shown when user minimizes the banner on mobile) -->
+            <div class="launch-mini-collapsed-bar" data-action="toggle-launch-collapse" title="Tap to expand launch countdown & offer details">
+              <div style="display: flex; align-items: center; gap: 0.5rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                <span class="pulse-icon">⚡</span>
+                <span style="font-size: 0.82rem;"><strong>3-Month Launch Deals:</strong> 15% OFF (Code: <strong style="color:#fde047;">LAUNCH2026</strong>)</span>
+              </div>
+              <span class="mini-expand-pill">View Timer ▼</span>
             </div>
 
-            <h1 class="launch-main-title">
-              WELCOME TO <span class="gold-gradient-text">AUTO HOMAGE</span>
-            </h1>
-            
-            <p class="launch-description">
-              We are officially live! To celebrate our Grand Launch, enjoy exclusive discount offers on all genuine car care products, Gladiator formulas, custom 3D floor mats, and vehicle parts for <strong>3 FULL MONTHS</strong>!
-            </p>
-
-            <!-- LIVE COUNTDOWN TIMER CARD -->
-            <div class="countdown-wrapper">
-              <div class="countdown-header">
-                <span class="live-dot"></span>
-                <span class="countdown-heading">3-MONTH LAUNCH DISCOUNT COUNTDOWN</span>
-                <span class="countdown-dates">(Sept 1, 2026 — Dec 1, 2026)</span>
+            <!-- Full Collapsible Banner Content -->
+            <div class="launch-card-collapsible-body">
+              <div class="launch-top-row">
+                <div class="launch-card-badge">
+                  <span class="pulse-icon">⚡</span>
+                  <span>OFFICIAL SEPTEMBER 1ST WEBSITE GRAND LAUNCH</span>
+                  <span class="pulse-icon">⚡</span>
+                </div>
+                
+                <!-- Mobile Collapse / Minimize Button -->
+                <button class="btn-launch-collapse-toggle" data-action="toggle-launch-collapse" aria-label="Toggle Launch Banner">
+                  <span>${this.isLaunchBannerCollapsed ? '▼ Expand Offer Details' : '▲ Collapse Offer'}</span>
+                </button>
               </div>
 
-              <div class="countdown-timer-grid">
-                <div class="timer-box">
-                  <div class="timer-value" id="cdDays">00</div>
-                  <div class="timer-label">DAYS</div>
-                </div>
-                <div class="timer-colon">:</div>
-                <div class="timer-box">
-                  <div class="timer-value" id="cdHours">00</div>
-                  <div class="timer-label">HOURS</div>
-                </div>
-                <div class="timer-colon">:</div>
-                <div class="timer-box">
-                  <div class="timer-value" id="cdMins">00</div>
-                  <div class="timer-label">MINUTES</div>
-                </div>
-                <div class="timer-colon">:</div>
-                <div class="timer-box">
-                  <div class="timer-value" id="cdSecs">00</div>
-                  <div class="timer-label">SECONDS</div>
-                </div>
-              </div>
-            </div>
+              <h1 class="launch-main-title">
+                WELCOME TO <span class="gold-gradient-text">AUTO HOMAGE</span>
+              </h1>
+              
+              <p class="launch-description">
+                We are officially live! To celebrate our Grand Launch, enjoy exclusive discount offers on all genuine car care products, Gladiator formulas, custom 3D floor mats, and vehicle parts for <strong>3 FULL MONTHS</strong>!
+              </p>
 
-            <!-- DISCOUNT COUPON & ACTION BUTTONS -->
-            <div class="launch-action-row">
-              <div class="coupon-code-card" data-action="copy-code" data-code="LAUNCH2026" title="Click to copy 15% discount code">
-                <div class="coupon-tag">LAUNCH DISCOUNT COUPON</div>
-                <div class="coupon-val-group">
-                  <span class="coupon-code-text">LAUNCH2026</span>
-                  <span class="coupon-copy-badge">📋 COPY (15% OFF)</span>
+              <!-- LIVE COUNTDOWN TIMER CARD -->
+              <div class="countdown-wrapper">
+                <div class="countdown-header">
+                  <span class="live-dot"></span>
+                  <span class="countdown-heading">3-MONTH LAUNCH DISCOUNT COUNTDOWN</span>
+                  <span class="countdown-dates">(Sept 1, 2026 — Dec 1, 2026)</span>
+                </div>
+
+                <div class="countdown-timer-grid">
+                  <div class="timer-box">
+                    <div class="timer-value" id="cdDays">00</div>
+                    <div class="timer-label">DAYS</div>
+                  </div>
+                  <div class="timer-colon">:</div>
+                  <div class="timer-box">
+                    <div class="timer-value" id="cdHours">00</div>
+                    <div class="timer-label">HOURS</div>
+                  </div>
+                  <div class="timer-colon">:</div>
+                  <div class="timer-box">
+                    <div class="timer-value" id="cdMins">00</div>
+                    <div class="timer-label">MINUTES</div>
+                  </div>
+                  <div class="timer-colon">:</div>
+                  <div class="timer-box">
+                    <div class="timer-value" id="cdSecs">00</div>
+                    <div class="timer-label">SECONDS</div>
+                  </div>
                 </div>
               </div>
 
-              <div class="launch-cta-buttons">
-                <a href="#catalogSection" class="btn-launch-primary" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
-                  🏷️ Shop Discounted Products
-                </a>
-                <a href="tel:${HOTLINE_PHONE}" class="btn-launch-secondary">
-                  📞 Call Order Hotline
-                </a>
-              </div>
-            </div>
+              <!-- DISCOUNT COUPON & ACTION BUTTONS -->
+              <div class="launch-action-row">
+                <div class="coupon-code-card" data-action="copy-code" data-code="LAUNCH2026" title="Click to copy 15% discount code">
+                  <div class="coupon-tag">LAUNCH DISCOUNT COUPON</div>
+                  <div class="coupon-val-group">
+                    <span class="coupon-code-text">LAUNCH2026</span>
+                    <span class="coupon-copy-badge">📋 COPY (15% OFF)</span>
+                  </div>
+                </div>
 
-            <!-- KEY PROMO HIGHLIGHTS -->
-            <div class="launch-highlights-bar">
-              <div class="highlight-item">
-                <span class="hl-icon">🎉</span>
-                <div>
-                  <div class="hl-title">Grand Launch Discounts</div>
-                  <div class="hl-desc">15% - 25% Off Storewide</div>
+                <div class="launch-cta-buttons">
+                  <a href="#catalogSection" class="btn-launch-primary" onclick="document.getElementById('catalogSection')?.scrollIntoView({behavior:'smooth'})">
+                    🏷️ Shop Discounted Products
+                  </a>
+                  <a href="tel:${HOTLINE_PHONE}" class="btn-launch-secondary">
+                    📞 Call Order Hotline
+                  </a>
                 </div>
               </div>
-              <div class="highlight-item">
-                <span class="hl-icon">⏳</span>
-                <div>
-                  <div class="hl-title">Valid for 3 Months</div>
-                  <div class="hl-desc">Sept 1 to Dec 1, 2026</div>
+
+              <!-- KEY PROMO HIGHLIGHTS -->
+              <div class="launch-highlights-bar">
+                <div class="highlight-item">
+                  <span class="hl-icon">🎉</span>
+                  <div>
+                    <div class="hl-title">Grand Launch Discounts</div>
+                    <div class="hl-desc">15% - 25% Off Storewide</div>
+                  </div>
                 </div>
-              </div>
-              <div class="highlight-item">
-                <span class="hl-icon">🚚</span>
-                <div>
-                  <div class="hl-title">Pay on Delivery</div>
-                  <div class="hl-desc">Nairobi &amp; Countrywide Express</div>
+                <div class="highlight-item">
+                  <span class="hl-icon">⏳</span>
+                  <div>
+                    <div class="hl-title">Valid for 3 Months</div>
+                    <div class="hl-desc">Sept 1 to Dec 1, 2026</div>
+                  </div>
+                </div>
+                <div class="highlight-item">
+                  <span class="hl-icon">🚚</span>
+                  <div>
+                    <div class="hl-title">Pay on Delivery</div>
+                    <div class="hl-desc">Nairobi &amp; Countrywide Express</div>
+                  </div>
                 </div>
               </div>
             </div>
